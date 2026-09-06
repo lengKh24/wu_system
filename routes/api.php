@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\LecturerController;
 use App\Http\Controllers\Api\MajorController;
+use App\Http\Controllers\Api\RetakeExamController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StatusController;
@@ -44,6 +45,11 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::prefix('certificates')->name('certificates.')->group(function () {
         Route::get('/preview-number', [CertificateController::class, 'preview'])->name('preview');
         Route::get('/report', [CertificateController::class, 'report'])->name('report');
+    });
+
+    Route::prefix('retake-exams')->name('retake-exams.')->group(function () {
+        Route::get('/export', [RetakeExamController::class, 'exportExcel'])->name('export');
+        Route::post('/import', [RetakeExamController::class, 'importExcel'])->name('import');
     });
 
     Route::middleware('permission:alert.view')->prefix('alerts')->name('alerts.')->group(function () {
@@ -87,6 +93,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'statuses'     => StatusController::class,
         'certificates' => CertificateController::class,
         'alerts'       => AlertController::class,
+        'retake-exams' => RetakeExamController::class,
         'users'        => UserController::class,
     ], [
         'faculties'    => 'faculty',

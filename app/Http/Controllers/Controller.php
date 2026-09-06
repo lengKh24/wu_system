@@ -15,7 +15,7 @@ abstract class Controller
 {
     use Generic;
 
-    protected string $name;
+    protected ?string $name = null;
     protected string $model;
     protected string $resource;
     protected array|string $relationships = [];

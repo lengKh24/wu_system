@@ -15,7 +15,7 @@ abstract class IExport implements FromQuery, WithHeadings, WithMapping, WithEven
     protected string $model;
     protected array $relationships = [];
     protected array $headings      = [];
-    protected bool $protectHeader  = true;
+    protected bool $protectHeader  = false;
     protected int $numRow          = 0;
 
     public function query()
