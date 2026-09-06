@@ -2,6 +2,12 @@
 @section('title', 'Roles & Permissions')
 @section('content')
 
+    <script>
+        window.CURRENT_USER_ID = {{ auth()->id() }};
+        window.CAN_DELETE_USER = @json(auth()->user()->can('role.delete'));
+        window.CAN_RESET_PASSWORD = @json(auth()->user()->can('role.edit'));
+    </script>
+
     <x-core.page-header title="តួនាទី និងសិទ្ធិចូលប្រើ (Roles & Permissions)"
         subtitle="គ្រប់គ្រងអ្វីដែលបុគ្គលិកនីមួយៗអាចមើល ឬកែប្រែបាន (Control what each staff member can see and edit)" />
 
@@ -108,6 +114,42 @@
             <button type="submit" form="roleForm" id="roleSubmitBtn"
                 class="px-6 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 active:scale-95 rounded-xl transition-all">
                 រក្សាទុក (Save Role)
+            </button>
+        </x-slot:footer>
+    </x-ui.modal>
+
+    <x-ui.modal id="resetPasswordModal" cardId="resetPasswordModalCard" titleId="resetPasswordModalTitle"
+        closeFn="ResetPasswordModal"
+        title="កំណត់ពាក្យសម្ងាត់ថ្មី (Reset Password)" formId="resetPasswordForm" maxWidth="max-w-md">
+        <input type="hidden" name="user_id">
+        <p id="resetPasswordUserLabel" class="text-sm text-neutral-500 dark:text-neutral-400"></p>
+
+        <div>
+            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
+                ពាក្យសម្ងាត់ថ្មី (New Password)</label>
+            <div class="relative">
+                <input required type="password" name="password" id="resetPasswordInput" minlength="8"
+                    placeholder="យ៉ាងតិច ៨ តួអក្សរ (At least 8 characters)"
+                    class="w-full px-4 py-2.5 pr-11 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                <button type="button" id="toggleResetPasswordVisibility"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+            </div>
+            <p class="text-[11px] text-neutral-400 mt-1.5">អ្នកប្រើប្រាស់នេះនឹងត្រូវប្រើពាក្យសម្ងាត់ថ្មីនេះនៅពេលចូលលើកក្រោយ (This staff member will use this password to log in next time)</p>
+        </div>
+
+        <x-slot:footer>
+            <button type="button" onclick="ResetPasswordModal.toggle(false)"
+                class="px-5 py-2.5 text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/5 rounded-xl transition-all">
+                បោះបង់ (Cancel)
+            </button>
+            <button type="submit" form="resetPasswordForm" id="resetPasswordSubmitBtn"
+                class="px-6 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 active:scale-95 rounded-xl transition-all">
+                កំណត់ពាក្យសម្ងាត់ (Reset Password)
             </button>
         </x-slot:footer>
     </x-ui.modal>

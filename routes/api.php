@@ -65,6 +65,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:role.delete')->delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
 
     Route::middleware('permission:role.edit')->put('/users/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
+    Route::middleware('permission:role.edit')->put('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
 
     Route::middleware('permission:activity.view')->prefix('activity-log')->name('activity-log.')->group(function () {
         Route::get('/', [ActivityLogController::class, 'index'])->name('index');

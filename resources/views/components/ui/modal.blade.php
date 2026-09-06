@@ -23,6 +23,10 @@
     'title' => 'Modal',
     'formId' => null,
     'maxWidth' => 'max-w-lg',
+    // Global JS object whose .toggle(false) closes this modal — override
+    // when a page has more than one modal (each needs its own toggle fn),
+    // defaults to the shared 'AppModal' every single-modal page already uses.
+    'closeFn' => 'AppModal',
 ])
 
 <div id="{{ $id }}"
@@ -34,7 +38,7 @@
         {{-- Header (fixed) --}}
         <div class="shrink-0 px-6 py-4 border-b border-neutral-100 dark:border-white/5 flex items-center justify-between bg-white dark:bg-neutral-900">
             <h3 id="{{ $titleId }}" class="text-lg font-bold text-neutral-900 dark:text-white">{{ $title }}</h3>
-            <button type="button" onclick="AppModal.toggle(false)"
+            <button type="button" onclick="{{ $closeFn }}.toggle(false)"
                     class="text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
