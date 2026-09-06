@@ -5,14 +5,31 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 abstract class IModel extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected array $searchable = [];
     protected string $keyName   = 'shortcut';
     protected string $operator  = '=';
+
+    /**
+     * Every module logs create/update/delete automatically — who did it,
+     * when, and which fields changed. Only fillable attributes are
+     * recorded (skips relations/timestamps), only when something actually
+     * changed, so an untouched "update" doesn't spam the log.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName(class_basename($this));
+    }
 
     public function __construct(array $attributes = [])
     {

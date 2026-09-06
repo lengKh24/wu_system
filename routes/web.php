@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ExamScheduleController;
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CampusController;
@@ -46,14 +47,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/exam-schedule', ExamScheduleController::class)->name('exam.schedule');
     });
 
-    // Alerts stay open to any logged-in user regardless of role.
-    Route::resource('alert', AlertController::class)->only('index');
+    Route::resource('alert', AlertController::class)->only('index')->middleware('can:alert.view');
 
     Route::resource('student', StudentController::class)->only('index')->middleware('can:student.view');
     Route::resource('certificate', StudentStatusController::class)->only('index')->middleware('can:certificate.view');
     Route::resource('app-status', StatusController::class)->only('index')->middleware('can:app-status.view');
 
     Route::resource('role', RoleController::class)->only('index')->middleware('can:role.view');
+    Route::resource('activity', ActivityLogController::class)->only('index')->middleware('can:activity.view');
 
     Route::resource('profile', ProfileController::class)->only(['edit', 'update', 'destroy']);
 });

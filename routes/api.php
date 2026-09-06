@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AlertController;
 use App\Http\Controllers\Api\BatchController;
@@ -51,13 +52,15 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         Route::post('/import', [RetakeExamController::class, 'importExcel'])->name('import');
     });
 
-    Route::prefix('alerts')->name('alerts.')->group(function () {
+    Route::middleware('permission:alert.view')->prefix('alerts')->name('alerts.')->group(function () {
         Route::get('/dashboard', [AlertController::class, 'dashboard'])->name('dashboard');
-        Route::delete('/bulk', [AlertController::class, 'bulkDestroy'])->name('bulk-destroy');
-        Route::post('/{alert}/complete', [AlertController::class, 'complete'])->name('complete');
-        Route::post('/{alert}/snooze', [AlertController::class, 'snooze'])->name('snooze');
         Route::get('/{alert}/logs', [AlertController::class, 'logs'])->name('logs');
     });
+    Route::middleware('permission:alert.edit')->prefix('alerts')->name('alerts.')->group(function () {
+        Route::post('/{alert}/complete', [AlertController::class, 'complete'])->name('complete');
+        Route::post('/{alert}/snooze', [AlertController::class, 'snooze'])->name('snooze');
+    });
+    Route::middleware('permission:alert.delete')->delete('/alerts/bulk', [AlertController::class, 'bulkDestroy'])->name('alerts.bulk-destroy');
 
     Route::middleware('permission:role.view')->prefix('roles')->name('roles.')->group(function () {
         Route::get('/', [RoleController::class, 'index'])->name('index');
@@ -68,6 +71,12 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:role.delete')->delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
 
     Route::middleware('permission:role.edit')->put('/users/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
+
+    Route::middleware('permission:activity.view')->prefix('activity-log')->name('activity-log.')->group(function () {
+        Route::get('/', [ActivityLogController::class, 'index'])->name('index');
+        Route::get('/modules', [ActivityLogController::class, 'modules'])->name('modules');
+        Route::get('/users', [ActivityLogController::class, 'users'])->name('users');
+    });
 
     // Register API resource routes for various controllers
     api_routes([
@@ -97,7 +106,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'students'     => 'student',
         'statuses'     => 'app-status',
         'certificates' => 'certificate',
-        // 'alerts' intentionally ungated — every logged-in user manages alerts.
+        'alerts'       => 'alert',
         // 'exam-states' registered separately above, fully public.
         'users'        => 'role',
     ]);

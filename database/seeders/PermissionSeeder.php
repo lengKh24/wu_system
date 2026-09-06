@@ -10,8 +10,7 @@ use Spatie\Permission\Models\Role;
 class PermissionSeeder extends Seeder
 {
     /**
-     * Module => label. Alerts is intentionally excluded — every logged-in
-     * user can manage alerts regardless of role, so it's never gated.
+     * Module => label.
      */
     protected const MODULES = [
         'student'     => 'Student',
@@ -27,6 +26,8 @@ class PermissionSeeder extends Seeder
         'state-exam'  => 'State Exam',
         'certificate' => 'Certificate',
         'role'        => 'Roles & Permissions',
+        'activity'    => 'Activity Log',
+        'alert'       => 'Alerts',
     ];
 
     protected const ACTIONS = ['view', 'create', 'edit', 'delete'];
@@ -56,7 +57,10 @@ class PermissionSeeder extends Seeder
                 'name',
                 collect($modules)->flatMap(fn ($m) => collect(self::ACTIONS)->map(fn ($a) => "{$m}.{$a}"))->all()
             )->get();
-            $role->syncPermissions($permissions);
+            // Additive, not a replace — re-running this seeder (e.g. after
+            // adding a new module) must never wipe out permissions someone
+            // assigned by hand through the /role UI afterward.
+            $role->givePermissionTo($permissions);
         }
 
         $adminUser = User::where('email', 'admin@system.me')->first();

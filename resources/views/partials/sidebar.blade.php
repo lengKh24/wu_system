@@ -79,6 +79,7 @@
                             ទំព័រដើម
                         </x-sidebar-link>
 
+                        @can('alert.view')
                         <li class="pt-4 pb-1">
                             <span
                                 class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Notification</span>
@@ -93,6 +94,7 @@
                             </x-slot>
                             ការជូនដំណឹង (Alerts)
                         </x-sidebar-link>
+                        @endcan
 
                         @can('state-exam.view')
                             <li class="pt-4 pb-1">
@@ -334,6 +336,22 @@
                                 </x-slot>
                                 តួនាទី និងសិទ្ធិ (Roles & Permissions)
                             </x-sidebar-link>
+                        @endcan
+
+                        @can('activity.view')
+                            <x-sidebar-link route="activity.index">
+                                <x-slot name="icon">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </x-slot>
+                                កំណត់ត្រាសកម្មភាព (Activity Log)
+                            </x-sidebar-link>
+                        @endcan
+
+                        @can('role.view')
                             <x-sidebar-link route="register">
                                 <x-slot name="icon">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"

@@ -81,7 +81,15 @@ class Alert extends IModel
         }
 
         $duration = $this->start_date->diffInSeconds($this->end_date);
-        $nextStart = $this->start_date->copy()->add($this->repeat_interval, $unit);
+        $nextStart = $this->start_date->copy();
+
+        // Skip past every occurrence that's already elapsed, not just one —
+        // an alert overdue by several intervals must land on the next
+        // *future* occurrence in a single click, or it stays visibly
+        // overdue and the "Done" button looks like it does nothing.
+        do {
+            $nextStart = $nextStart->add($this->repeat_interval, $unit);
+        } while ($nextStart->copy()->addSeconds($duration)->isPast());
 
         if ($this->repeat_until && $nextStart->gt($this->repeat_until->copy()->endOfDay())) {
             $this->update(['status' => 'completed', 'completed_at' => now()]);

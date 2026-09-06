@@ -228,7 +228,19 @@ export function bindQuickActions(dom, { onEdit, onChange }) {
             if (completeBtn) {
                 const res = await fetch(`${API_BASE}/${completeBtn.dataset.id}/complete`, { method: 'POST', headers: { Accept: 'application/json' } });
                 if (res.ok) {
-                    Toast.fire({ icon: 'success', title: 'ធ្វើរួចរាល់! (Marked complete)' });
+                    const { data } = await res.json();
+                    // A repeating alert doesn't move to Done — it re-arms to
+                    // its next occurrence and stays pending. Say so, or a
+                    // still-visible, still-overdue-looking card reads as a
+                    // no-op even though the click worked correctly.
+                    if (data?.status === 'pending') {
+                        const nextDate = data.start_date
+                            ? new Date(data.start_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                            : '';
+                        Toast.fire({ icon: 'success', title: `កំណត់ពេលថ្មី! (Advanced to ${nextDate})` });
+                    } else {
+                        Toast.fire({ icon: 'success', title: 'ធ្វើរួចរាល់! (Marked complete)' });
+                    }
                     onChange();
                 }
                 return;
