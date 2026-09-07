@@ -76,6 +76,10 @@ class PermissionSeeder extends Seeder
         ],
         'Accounting' => [
             'retake-registration.view',
+            // Read-only — ACC needs to see which payment_batch to
+            // reconcile against, but creating/editing a batch stays SA's
+            // job (see the payment_batches migration docblock).
+            'payment-batch.view',
             'payment-entry.view', 'payment-entry.create', 'payment-entry.edit',
         ],
         'Customer Service' => [

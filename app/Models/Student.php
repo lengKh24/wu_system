@@ -60,7 +60,7 @@ class Student extends IModel
 
     protected function casts(): array
     {
-        return ['admission_date' => 'date', 'degree_type' => Degree::class,];
+        return ['admission_date' => 'date', 'degree_type' => Degree::class, 'is_restudy' => 'boolean'];
     }
 
     public function person()

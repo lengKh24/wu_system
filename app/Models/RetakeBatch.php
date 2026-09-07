@@ -99,7 +99,11 @@ class RetakeBatch extends IModel
                     'subject_id'               => $registration->subject_id,
                     'lecturer_id'              => $registration->lecturer_id,
                     'previous_registration_id' => $registration->id,
-                    'is_selected'              => true,
+                    // Opt-in, not opt-out (Leng's call, 2026-09-07): a
+                    // failed/absent student is only *eligible* for the next
+                    // stage here — they still have to actively pick this
+                    // subject again via the public self-service page.
+                    'is_selected'              => false,
                 ]);
             }
 
@@ -118,8 +122,24 @@ class RetakeBatch extends IModel
                     'exam_type_id'             => $nextType->id,
                     'subject_id'               => $log->subject_id,
                     'previous_deletion_log_id' => $log->id,
-                    'is_selected'              => true,
+                    // Opt-in — see the matching note in the loop above.
+                    'is_selected'              => false,
                 ]);
+            }
+
+            // Persistent flag, not derived per-view — Leng's call, 2026-09-07:
+            // wanted a single field to check "is this student in Restudy"
+            // outside this module too, not just an inference from having a
+            // restudy-typed registration. Set here, once, the moment a
+            // student is actually carried into Restudy — a mass query-builder
+            // update, deliberately bypassing $fillable (this is never meant
+            // to be settable through a normal student create/update request).
+            if ($nextType->code === ExamType::RESTUDY) {
+                $studentIds = $stillOpen->pluck('student_id')
+                    ->merge($deletedRows->pluck('student_id'))
+                    ->unique();
+
+                Student::whereIn('id', $studentIds)->update(['is_restudy' => true]);
             }
 
             return $next;

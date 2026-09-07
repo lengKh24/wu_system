@@ -76,6 +76,13 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         Route::get('/{retake_registration}', [RetakeRegistrationController::class, 'show'])->name('show');
     });
 
+    // REG's "prepare schedule" export — flat sibling route (like
+    // customer-service below), not nested under /retake-registrations/...,
+    // so it never collides with the {retake_registration} wildcard above.
+    Route::middleware('permission:retake-registration.view')
+        ->get('/retake-registrations-export', [RetakeRegistrationController::class, 'exportList'])
+        ->name('retake-registrations.export');
+
     // Customer Service: read-only, registered students only — its own
     // permission, separate from REG's full retake-registration.view.
     Route::middleware('permission:retake-cs.view')

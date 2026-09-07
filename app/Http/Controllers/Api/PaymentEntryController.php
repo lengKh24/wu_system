@@ -33,13 +33,28 @@ class PaymentEntryController extends Controller
      * set server-side. ACC records payment_number/payment_note only; it
      * cannot change payment_status (that stays SA's action, see
      * RetakeRegistrationController::markPaid()).
+     *
+     * One payment_batch is already one invoice (SA splits into separate
+     * batches when subjects are paid in separate transactions — confirmed
+     * with Leng, 2026-09-07), so it only ever needs ONE reconciliation
+     * record. updateOrCreate here (backed by the DB's unique constraint on
+     * payment_batch_id) means re-submitting the same batch corrects the
+     * existing entry instead of stacking up duplicates.
      */
     public function store(PaymentEntryRequest $request)
     {
-        return $this->save($request, [
-            'entered_by' => auth()->id(),
-            'entered_at' => now(),
-        ]);
+        $validated = $request->validated();
+
+        $entry = PaymentEntry::updateOrCreate(
+            ['payment_batch_id' => $validated['payment_batch_id']],
+            [
+                ...$validated,
+                'entered_by' => auth()->id(),
+                'entered_at' => now(),
+            ]
+        );
+
+        return new PaymentEntryResource($this->reload($entry));
     }
 
     public function show(PaymentEntry $paymentEntry)

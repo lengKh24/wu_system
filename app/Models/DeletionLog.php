@@ -3,6 +3,11 @@ namespace App\Models;
 
 class DeletionLog extends IModel
 {
+    // Table is 'deletion_log' (singular, see its migration) — Eloquent's
+    // default convention would otherwise guess 'deletion_logs' and every
+    // query here would 404 against a table that doesn't exist.
+    protected $table = 'deletion_log';
+
     public const REASON_UNPAID_EXPIRED = 'unpaid_expired';
     public const REASON_MANUAL         = 'manual';
     public const REASONS               = [self::REASON_UNPAID_EXPIRED, self::REASON_MANUAL];

@@ -185,6 +185,90 @@
                             </li>
                         @endcan
 
+                        {{-- REG's own page (import/close/carry-forward/registrations) — gated on
+                             .edit rather than .view, since SA/ACC/Score/CS all share .view too
+                             (see PermissionSeeder::ROLE_PERMISSIONS) but only REG has .edit. --}}
+                        @can('retake-registration.edit')
+                            <x-sidebar-link route="retake-registration.index">
+                                <x-slot name="icon">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                    </svg>
+                                </x-slot>
+                                ប្រឡងសង (Retake Exam)
+                            </x-sidebar-link>
+                        @endcan
+
+                        @can('retake-score.edit')
+                            <li class="pt-4 pb-1">
+                                <span
+                                    class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Scoring</span>
+                            </li>
+                            <x-sidebar-link route="retake-score.index">
+                                <x-slot name="icon">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </x-slot>
+                                ការដាក់ពិន្ទុ (Score Entry)
+                            </x-sidebar-link>
+                        @endcan
+
+                        @can('retake-payment.edit')
+                            <li class="pt-4 pb-1">
+                                <span
+                                    class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Payment</span>
+                            </li>
+                            <x-sidebar-link route="retake-payment.index">
+                                <x-slot name="icon">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                                    </svg>
+                                </x-slot>
+                                ការបង់ប្រាក់ (Payments)
+                            </x-sidebar-link>
+                        @endcan
+
+                        @can('payment-entry.view')
+                            <li class="pt-4 pb-1">
+                                <span
+                                    class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Accounting</span>
+                            </li>
+                            <x-sidebar-link route="payment-entry.index">
+                                <x-slot name="icon">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                                    </svg>
+                                </x-slot>
+                                ការផ្គូផ្គងបង់ប្រាក់ (Reconciliation)
+                            </x-sidebar-link>
+                        @endcan
+
+                        @can('retake-cs.view')
+                            <li class="pt-4 pb-1">
+                                <span
+                                    class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Customer Service</span>
+                            </li>
+                            <x-sidebar-link route="retake-cs.index">
+                                <x-slot name="icon">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                                    </svg>
+                                </x-slot>
+                                សេវាកម្មអតិថិជន (Customer Service)
+                            </x-sidebar-link>
+                        @endcan
+
                         @can('certificate.view')
                             <li class="pt-4 pb-1">
                                 <span
@@ -223,7 +307,7 @@
                         @endcan
 
                         @canany(['faculty.view', 'major.view', 'batch.view', 'shift.view', 'group.view',
-                            'app-status.view'])
+                            'app-status.view', 'campus.view'])
                             <li class="pt-4 pb-1">
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Academics</span>
@@ -295,6 +379,19 @@
                                     </svg>
                                 </x-slot>
                                 ក្រុមសិក្សា (Group)
+                            </x-sidebar-link>
+                        @endcan
+
+                        @can('campus.view')
+                            <x-sidebar-link route="campus.index">
+                                <x-slot name="icon">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" />
+                                    </svg>
+                                </x-slot>
+                                បរិវេណ (Campus)
                             </x-sidebar-link>
                         @endcan
 

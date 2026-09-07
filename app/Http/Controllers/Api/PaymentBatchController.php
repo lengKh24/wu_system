@@ -29,12 +29,31 @@ class PaymentBatchController extends Controller
     }
 
     /**
-     * SA uploads a payment invoice/proof — uploaded_by is set server-side,
-     * never trusted from the request.
+     * SA uploads a payment invoice/proof image — uploaded_by and paid_at
+     * are set server-side (this call IS the moment of marking paid, so
+     * there's nothing for SA to pick). invoice_path/invoice_type are
+     * computed from the stored file, not accepted as raw input — routes
+     * through the base save() helper via a plain Model::create() would
+     * mass-assign the raw UploadedFile onto a non-existent column, so this
+     * bypasses it and builds the array explicitly instead.
      */
     public function store(PaymentBatchRequest $request)
     {
-        return $this->save($request, ['uploaded_by' => auth()->id()]);
+        $data = $request->validated();
+        $file = $request->file('invoice_file');
+        unset($data['invoice_file']);
+
+        if ($file) {
+            $data['invoice_path'] = $file->store('payment-invoices', 'public');
+            $data['invoice_type'] = $file->getClientMimeType();
+        }
+
+        $data['uploaded_by'] = auth()->id();
+        $data['paid_at']     = now();
+
+        $batch = PaymentBatch::create($data);
+
+        return new PaymentBatchResource($this->reload($batch));
     }
 
     public function show(PaymentBatch $paymentBatch)

@@ -1,251 +1,110 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retake Exam Registration</title>
-    {{-- Plain functional page, no build step, no styling effort spent —
-         backend endpoints are the point here; restyle later. --}}
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; color: #111; }
-        h1 { font-size: 1.25rem; }
-        h2 { font-size: 1.05rem; margin-top: 2rem; }
-        label { display: block; margin-top: 0.75rem; font-weight: bold; }
-        input[type=text], input[type=date] { display: block; width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
-        button { margin-top: 1rem; padding: 0.5rem 1rem; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-        th, td { border: 1px solid #ccc; padding: 0.4rem 0.5rem; text-align: left; font-size: 0.9rem; }
-        #errorBox { color: #b00; margin-top: 1rem; display: none; }
-        #okBox { color: #076; margin-top: 1rem; display: none; }
-        .batch-block { border: 1px solid #ddd; padding: 1rem; margin-top: 1rem; }
-        .hidden { display: none; }
-        .muted { color: #666; font-size: 0.85rem; }
-    </style>
-</head>
-<body>
+@extends('layouts.state.public')
+@section('title', 'ការចុះឈ្មោះប្រឡងសង (Retake Exam Registration)')
+@section('content')
 
-    <h1>Retake Exam Registration / ការចុះឈ្មោះប្រឡងសង</h1>
-    <p class="muted">Enter your student code and date of birth to see and confirm your retake registration.</p>
-
-    <div id="lookupForm">
-        <label for="code">Student Code</label>
-        <input type="text" id="code" autocomplete="off">
-
-        <label for="dob">Date of Birth</label>
-        <input type="date" id="dob">
-
-        <button id="lookupBtn" type="button">Look Up</button>
+<div class="text-center mb-12 fade-up">
+    <div class="mx-auto mb-5 flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white shadow-lg shadow-indigo-500/25">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+        </svg>
     </div>
 
-    <div id="errorBox"></div>
-    <div id="okBox"></div>
+    <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 text-[11px] font-bold tracking-widest uppercase rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-500/20">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        Student Self-Service
+    </div>
+    <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight">ការចុះឈ្មោះប្រឡងសង</h1>
+    <p class="mt-3 text-sm text-neutral-500 dark:text-neutral-400 max-w-md mx-auto">
+        បញ្ចូលកូដនិស្សិតរបស់អ្នកដើម្បីមើល និងបញ្ជាក់ការចុះឈ្មោះប្រឡងសង
+        <span class="block text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">Enter your student code to see and confirm your retake registration</span>
+    </p>
+</div>
 
-    <div id="resultBox" class="hidden">
-        <h2 id="studentName"></h2>
-
-        <div id="pendingBatches"></div>
-
-        <div id="confirmSection" class="hidden">
-            <button id="saveSelectionsBtn" type="button">Save Selections</button>
-            <button id="confirmBtn" type="button">Confirm Registration</button>
-            <p class="muted">Saving selections does not lock anything in — you can change your mind and look up again later. Confirming locks in whatever is checked above and cannot be undone here; please pay at the Student Affairs office afterward to complete registration.</p>
+{{-- Lookup --}}
+<div id="retakeLookupCard" class="max-w-md mx-auto fade-up" style="animation-delay:120ms">
+    <div class="bg-white/80 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 rounded-3xl shadow-sm p-6 sm:p-7">
+        <label for="retakeCode" class="block text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">
+            កូដនិស្សិត (Student Code)
+        </label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center ps-4 pointer-events-none">
+                <svg class="w-4.5 h-4.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+            </div>
+            <input id="retakeCode" type="text" placeholder="e.g. ST-IT8800" autocomplete="off"
+                class="block w-full p-4 ps-11 text-base sm:text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/15 focus:border-indigo-400 dark:focus:border-indigo-500/50 dark:placeholder-neutral-500 outline-none transition-all" />
         </div>
+        <button id="retakeLookupBtn" type="button"
+            class="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+            </svg>
+            ស្វែងរក (Look Up)
+        </button>
+        <p id="retakeLookupError" class="hidden mt-3 text-center text-xs font-bold text-rose-500"></p>
+    </div>
+</div>
 
-        <div id="confirmedSection" class="hidden">
-            <h2>Already Confirmed</h2>
-            <table>
-                <thead><tr><th>Term</th><th>Exam Type</th><th>Subject</th><th>Registered At</th><th>Payment</th><th>Outcome</th></tr></thead>
-                <tbody id="confirmedRows"></tbody>
-            </table>
+{{-- Result --}}
+<div id="retakeResult" class="hidden max-w-2xl mx-auto mt-10 space-y-6 fade-up">
+
+    {{-- Student identity --}}
+    <div class="flex items-center gap-4 bg-white/80 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 rounded-2xl shadow-sm px-5 py-4">
+        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-bold text-lg shrink-0" id="retakeStudentInitial">?</div>
+        <div class="min-w-0">
+            <div id="retakeStudentName" class="font-bold text-neutral-900 dark:text-white truncate">—</div>
+            <div id="retakeStudentCode" class="text-xs text-neutral-400 font-mono">—</div>
         </div>
     </div>
 
-    <script>
-        (function () {
-            var apiBase = '/api/v1/retake-exam';
-            var currentCode = null;
-            var currentDob = null;
+    {{-- Pending batches --}}
+    <div id="retakePendingBatches" class="space-y-5"></div>
 
-            var lookupBtn = document.getElementById('lookupBtn');
-            var saveBtn = document.getElementById('saveSelectionsBtn');
-            var confirmBtn = document.getElementById('confirmBtn');
+    <div id="retakeConfirmSection" class="hidden space-y-3">
+        <div class="flex flex-col sm:flex-row gap-3">
+            <button id="retakeSaveBtn" type="button"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-bold text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm hover:bg-neutral-50 dark:hover:bg-white/5 active:scale-[0.98] transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                រក្សាទុកជម្រើស (Save Selections)
+            </button>
+            <button id="retakeConfirmBtn" type="button"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 rounded-2xl shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                បញ្ជាក់ការចុះឈ្មោះ (Confirm Registration)
+            </button>
+        </div>
+        <p class="text-center text-xs text-neutral-400 dark:text-neutral-500 max-w-md mx-auto">
+            រក្សាទុកជម្រើសមិនចាក់សោអ្វីទេ — អ្នកអាចផ្លាស់ប្តូរ និងស្វែងរកម្តងទៀតនៅពេលក្រោយ។ ការបញ្ជាក់នឹងចាក់សោជម្រើសបច្ចុប្បន្ន ហើយមិនអាចត្រឡប់វិញបានទេ សូមទាក់ទងការិយាល័យកិច្ចការនិស្សិតដើម្បីបង់ប្រាក់។
+            <span class="block mt-1 text-neutral-400/80 dark:text-neutral-600">Saving does not lock anything in. Confirming locks in what's checked above and cannot be undone here — please pay at the Student Affairs office afterward.</span>
+        </p>
+    </div>
 
-            function showError(message) {
-                var box = document.getElementById('errorBox');
-                box.textContent = message;
-                box.style.display = 'block';
-                document.getElementById('okBox').style.display = 'none';
-            }
+    {{-- Confirmed --}}
+    <div id="retakeConfirmedSection" class="hidden">
+        <h2 class="flex items-center gap-2 text-sm font-bold text-neutral-700 dark:text-neutral-200 mb-3">
+            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            បានបញ្ជាក់រួច (Already Confirmed)
+        </h2>
+        <div id="retakeConfirmedList" class="space-y-2"></div>
+    </div>
+</div>
 
-            function showOk(message) {
-                var box = document.getElementById('okBox');
-                box.textContent = message;
-                box.style.display = 'block';
-                document.getElementById('errorBox').style.display = 'none';
-            }
+@endsection
 
-            function clearMessages() {
-                document.getElementById('errorBox').style.display = 'none';
-                document.getElementById('okBox').style.display = 'none';
-            }
+@push('modals')
+{{-- Toast stack — same reasoning as state-exam's public pages: a `fixed`
+     element nested inside <main>'s stacking context can't paint above the
+     footer, so this lives outside it, in the layout's 'modals' stack. --}}
+<div id="retakeToastStack" class="fixed top-5 right-5 z-[70] flex flex-col gap-2 w-[calc(100%-2.5rem)] max-w-sm"></div>
+@endpush
 
-            function post(path, body) {
-                return fetch(apiBase + path, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify(body)
-                }).then(function (res) {
-                    return res.json().then(function (json) {
-                        if (!res.ok || !json.success) {
-                            throw new Error(json.message || 'Something went wrong.');
-                        }
-                        return json.data;
-                    });
-                });
-            }
-
-            function subjectLabel(row) {
-                return (row.subject && row.subject.name) ? row.subject.name : ('Subject #' + row.id);
-            }
-
-            function renderPending(data) {
-                var container = document.getElementById('pendingBatches');
-                container.innerHTML = '';
-
-                if (!data.pending_batches || data.pending_batches.length === 0) {
-                    container.innerHTML = '<p class="muted">No pending registration found for this student.</p>';
-                    document.getElementById('confirmSection').classList.add('hidden');
-                    return;
-                }
-
-                data.pending_batches.forEach(function (batch) {
-                    var block = document.createElement('div');
-                    block.className = 'batch-block';
-
-                    var title = document.createElement('strong');
-                    title.textContent = (batch.term || '') + ' — ' + (batch.exam_type || '');
-                    block.appendChild(title);
-
-                    var table = document.createElement('table');
-                    table.innerHTML = '<thead><tr><th>Register?</th><th>Subject</th></tr></thead>';
-                    var tbody = document.createElement('tbody');
-
-                    var allRows = (batch.will_register || []).concat(batch.will_not_register || []);
-                    allRows.forEach(function (row) {
-                        var tr = document.createElement('tr');
-
-                        var tdCheck = document.createElement('td');
-                        var checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.checked = !!row.is_selected;
-                        checkbox.dataset.registrationId = row.id;
-                        tdCheck.appendChild(checkbox);
-                        tr.appendChild(tdCheck);
-
-                        var tdSubject = document.createElement('td');
-                        tdSubject.textContent = subjectLabel(row);
-                        tr.appendChild(tdSubject);
-
-                        tbody.appendChild(tr);
-                    });
-
-                    table.appendChild(tbody);
-                    block.appendChild(table);
-                    container.appendChild(block);
-                });
-
-                document.getElementById('confirmSection').classList.remove('hidden');
-            }
-
-            function renderConfirmed(data) {
-                var section = document.getElementById('confirmedSection');
-                var rows = data.confirmed_registrations || [];
-
-                if (rows.length === 0) {
-                    section.classList.add('hidden');
-                    return;
-                }
-
-                var tbody = document.getElementById('confirmedRows');
-                tbody.innerHTML = '';
-
-                rows.forEach(function (row) {
-                    var tr = document.createElement('tr');
-                    tr.innerHTML =
-                        '<td>' + ((row.term && row.term.title) || '') + '</td>' +
-                        '<td>' + ((row.exam_type && row.exam_type.name) || '') + '</td>' +
-                        '<td>' + subjectLabel(row) + '</td>' +
-                        '<td>' + (row.registered_at || '') + '</td>' +
-                        '<td>' + (row.payment_status || '') + '</td>' +
-                        '<td>' + (row.outcome || '') + '</td>';
-                    tbody.appendChild(tr);
-                });
-
-                section.classList.remove('hidden');
-            }
-
-            function renderStudent(data) {
-                var s = data.student;
-                var name = [s.first_name_kh, s.last_name_kh].filter(Boolean).join(' ')
-                    || [s.first_name, s.last_name].filter(Boolean).join(' ')
-                    || s.code;
-                document.getElementById('studentName').textContent = name + ' (' + s.code + ')';
-            }
-
-            function renderAll(data) {
-                document.getElementById('resultBox').classList.remove('hidden');
-                renderStudent(data);
-                renderPending(data);
-                renderConfirmed(data);
-            }
-
-            lookupBtn.addEventListener('click', function () {
-                clearMessages();
-                currentCode = document.getElementById('code').value.trim();
-                currentDob = document.getElementById('dob').value;
-
-                if (!currentCode || !currentDob) {
-                    showError('Please enter both student code and date of birth.');
-                    return;
-                }
-
-                post('/lookup', { code: currentCode, dob: currentDob })
-                    .then(renderAll)
-                    .catch(function (err) { showError(err.message); });
-            });
-
-            saveBtn.addEventListener('click', function () {
-                clearMessages();
-                var selections = Array.prototype.map.call(
-                    document.querySelectorAll('#pendingBatches input[type=checkbox]'),
-                    function (el) {
-                        return { id: parseInt(el.dataset.registrationId, 10), is_selected: el.checked };
-                    }
-                );
-
-                post('/select', { code: currentCode, dob: currentDob, selections: selections })
-                    .then(function (data) {
-                        showOk('Selections saved.');
-                        renderAll(data);
-                    })
-                    .catch(function (err) { showError(err.message); });
-            });
-
-            confirmBtn.addEventListener('click', function () {
-                clearMessages();
-
-                if (!window.confirm('Confirm registration with the subjects currently checked? This cannot be undone here.')) {
-                    return;
-                }
-
-                post('/confirm', { code: currentCode, dob: currentDob })
-                    .then(function (data) {
-                        showOk('Registration confirmed. Please proceed to Student Affairs for payment.');
-                        renderAll(data);
-                    })
-                    .catch(function (err) { showError(err.message); });
-            });
-        })();
-    </script>
-</body>
-</html>
+@push('scripts')
+    @vite(['resources/js/retake-exam-public/index.js'])
+@endpush

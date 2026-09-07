@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api;
 
+use App\Exports\RetakeRegistrationExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RetakeRegistrationRequest;
 use App\Http\Resources\RetakeRegistrationResource;
@@ -42,6 +43,12 @@ class RetakeRegistrationController extends Controller
             if ($outcome = $request->input('outcome')) {
                 $query->where('outcome', $outcome);
             }
+            // SA only ever acts on confirmed registrations (payment can't
+            // happen against a selection that might still change) — this
+            // lets their page ask for just those instead of the full list.
+            if ($request->boolean('confirmed_only')) {
+                $query->whereNotNull('registered_at');
+            }
 
             return $query;
         });
@@ -55,6 +62,24 @@ class RetakeRegistrationController extends Controller
     public function customerService(Request $request)
     {
         return $this->list($request, fn($query) => $query->withSubjectCount()->whereNotNull('registered_at'));
+    }
+
+    /**
+     * REG's "prepare schedule" export — an Excel download of whatever the
+     * Main List is currently filtered to (same filter params as index()).
+     * Named exportList, not export, since export(object, string) is a
+     * reserved method name on the base Controller (see importFile() on
+     * RetakeBatchController for the same reasoning — reusing a base method
+     * name with an incompatible signature is a fatal error, not a warning).
+     */
+    public function exportList(Request $request)
+    {
+        return $this->export(
+            new RetakeRegistrationExport($request->only([
+                'batch_id', 'exam_type_id', 'retake_term_id', 'payment_status', 'outcome',
+            ])),
+            'retake-registrations'
+        );
     }
 
     /**
@@ -95,13 +120,19 @@ class RetakeRegistrationController extends Controller
     /**
      * SA: attaches a payment_batch and marks paid. Only ever touches the
      * one registration passed in — an older stage's row is never mutated
-     * (decision #14).
+     * (decision #14). Requires the student to have already confirmed this
+     * registration themselves (registered_at set) — payment can't happen
+     * against a selection that might still change on the public page.
      */
     public function markPaid(Request $request, RetakeRegistration $retakeRegistration)
     {
         $validated = $request->validate([
             'payment_batch_id' => 'required|integer|exists:payment_batches,id',
         ]);
+
+        if (! $retakeRegistration->registered_at) {
+            return no_data('This student has not confirmed their registration yet — cannot mark it paid.', 422);
+        }
 
         $retakeRegistration->update([
             'payment_status'   => RetakeRegistration::PAYMENT_PAID,
@@ -113,7 +144,10 @@ class RetakeRegistrationController extends Controller
 
     /**
      * SA: same as markPaid, for the partial-payment case — a student who
-     * paid for 2 of their 4 failed subjects against one invoice.
+     * paid for 2 of their 4 failed subjects against one invoice. Same
+     * registered_at requirement as markPaid — unconfirmed ids are skipped
+     * rather than failing the whole batch, and reported back so SA can see
+     * which ones still need the student to confirm first.
      */
     public function bulkMarkPaid(Request $request)
     {
@@ -123,12 +157,23 @@ class RetakeRegistrationController extends Controller
             'ids.*'            => 'integer|exists:retake_registrations,id',
         ]);
 
-        $count = RetakeRegistration::whereIn('id', $validated['ids'])->update([
-            'payment_status'   => RetakeRegistration::PAYMENT_PAID,
-            'payment_batch_id' => $validated['payment_batch_id'],
-        ]);
+        $unconfirmed = RetakeRegistration::whereIn('id', $validated['ids'])
+            ->whereNull('registered_at')
+            ->pluck('id');
 
-        return has_data(null, "{$count} registration(s) marked paid.");
+        $count = RetakeRegistration::whereIn('id', $validated['ids'])
+            ->whereNotNull('registered_at')
+            ->update([
+                'payment_status'   => RetakeRegistration::PAYMENT_PAID,
+                'payment_batch_id' => $validated['payment_batch_id'],
+            ]);
+
+        $message = "{$count} registration(s) marked paid.";
+        if ($unconfirmed->isNotEmpty()) {
+            $message .= " {$unconfirmed->count()} skipped — not yet confirmed by the student.";
+        }
+
+        return has_data(['skipped_ids' => $unconfirmed->values()], $message);
     }
 
     /**
@@ -145,6 +190,13 @@ class RetakeRegistrationController extends Controller
     /**
      * Score: enters (or corrects) this registration's score. One score per
      * registration — updateOrCreate keeps it that way.
+     *
+     * Also auto-sets outcome (Leng's call, 2026-09-08): score >=
+     * PASSING_SCORE -> passed, otherwise failed. Skipped if the outcome is
+     * already 'absent' — a score showing up for a student flagged absent
+     * is itself the edge case, not something to silently overwrite; REG
+     * resolves that by hand via setOutcome() below, same as any other
+     * case this rule doesn't cover.
      */
     public function setScore(Request $request, RetakeRegistration $retakeRegistration)
     {
@@ -160,13 +212,23 @@ class RetakeRegistrationController extends Controller
             'entered_at' => now(),
         ]);
 
+        if ($retakeRegistration->outcome !== RetakeRegistration::OUTCOME_ABSENT) {
+            $retakeRegistration->update([
+                'outcome' => $validated['score'] >= RetakeRegistration::PASSING_SCORE
+                    ? RetakeRegistration::OUTCOME_PASSED
+                    : RetakeRegistration::OUTCOME_FAILED,
+            ]);
+        }
+
         return new RetakeRegistrationResource($this->reload($retakeRegistration));
     }
 
     /**
-     * REG/Score: marks the outcome once the exam's over — required before
+     * REG: manual override of outcome — required before
      * RetakeBatch::carryForwardTo() can find failed/absent rows to move on
-     * to the next stage.
+     * to the next stage. Normally outcome is set automatically by
+     * setScore() above; this exists for whatever that rule doesn't cover
+     * (absent students, corrections, policy exceptions).
      */
     public function setOutcome(Request $request, RetakeRegistration $retakeRegistration)
     {

@@ -18,6 +18,7 @@ class StudentResource extends IResource
                 'kh' => $degree?->labelKh(),
             ],
             'payment_as'     => $this->payment_as,
+            'is_restudy'     => (bool) $this->is_restudy,
             'year_level'     => $this->year_level,
             'from_school'    => $this->from_school,
             'intake'         => $this->intake,

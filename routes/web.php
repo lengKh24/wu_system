@@ -11,7 +11,12 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RetakeCustomerServiceController;
+use App\Http\Controllers\RetakeExamController;
 use App\Http\Controllers\RetakeExamPublicController;
+use App\Http\Controllers\RetakePaymentController;
+use App\Http\Controllers\RetakePaymentEntryController;
+use App\Http\Controllers\RetakeScoreController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StatusController;
@@ -53,6 +58,36 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::resource('alert', AlertController::class)->only('index')->middleware('can:alert.view');
+
+    // REG's Main List for the retake exam module — batches + registrations
+    // on one page. Named 'retake-registration.index' (not 'retake-exam.*')
+    // to avoid clashing with the public self-service route above. Gated on
+    // .edit (not .view) since SA/ACC/Score/CS all share .view too — this
+    // page's batch/import/outcome actions are REG-only.
+    Route::get('/retake-exam/registrations', [RetakeExamController::class, 'index'])
+        ->name('retake-registration.index')
+        ->middleware('can:retake-registration.edit');
+
+    // Score's own page — read the registrations list, enter/edit a score.
+    // No batch, import, outcome, selection, or delete access.
+    Route::get('/retake-exam/scores', [RetakeScoreController::class, 'index'])
+        ->name('retake-score.index')
+        ->middleware('can:retake-score.edit');
+
+    // SA's own page — confirmed registrations, mark paid, invite Telegram.
+    Route::get('/retake-exam/payments', [RetakePaymentController::class, 'index'])
+        ->name('retake-payment.index')
+        ->middleware('can:retake-payment.edit');
+
+    // ACC's own page — reconciliation entries against SA's payment batches.
+    Route::get('/retake-exam/payment-entries', [RetakePaymentEntryController::class, 'index'])
+        ->name('payment-entry.index')
+        ->middleware('can:payment-entry.view');
+
+    // Customer Service's own page — read-only, confirmed registrations only.
+    Route::get('/retake-exam/customer-service', [RetakeCustomerServiceController::class, 'index'])
+        ->name('retake-cs.index')
+        ->middleware('can:retake-cs.view');
 
     Route::resource('student', StudentController::class)->only('index')->middleware('can:student.view');
     Route::resource('certificate', StudentStatusController::class)->only('index')->middleware('can:certificate.view');

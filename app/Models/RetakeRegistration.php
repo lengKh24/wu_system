@@ -15,6 +15,12 @@ class RetakeRegistration extends IModel
     public const OUTCOME_ABSENT  = 'absent';
     public const OUTCOMES        = [self::OUTCOME_PENDING, self::OUTCOME_PASSED, self::OUTCOME_FAILED, self::OUTCOME_ABSENT];
 
+    // Leng's call, 2026-09-08: score >= this passes automatically. REG can
+    // still override via setOutcome() for cases this doesn't cover (e.g.
+    // a score entered in error, a policy exception) — see
+    // RetakeRegistrationController::setScore().
+    public const PASSING_SCORE = 50;
+
     protected $fillable = [
         'batch_id', 'student_id', 'retake_term_id', 'exam_type_id', 'subject_id', 'lecturer_id',
         'previous_registration_id', 'previous_deletion_log_id',
@@ -22,6 +28,12 @@ class RetakeRegistration extends IModel
         'payment_status', 'payment_batch_id',
         'outcome', 'telegram_invited_at', 'exam_session_id',
         'remark',
+    ];
+
+    // Own columns are almost all FK ids, not worth matching on — search by
+    // student code and subject name instead (see Builder::macro('whereLike')).
+    protected array $searchable = [
+        'student.code', 'subject.name_en', 'subject.name_kh', 'remark',
     ];
 
     protected $casts = [

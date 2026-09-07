@@ -13,9 +13,13 @@ use Illuminate\Support\Facades\Validator;
  * exam-states precedent (see routes/api.php) of a fully public JSON group.
  *
  * There is no login/session here, so every action re-verifies ownership
- * with the same two factors (student code + date of birth) rather than
- * trusting a stored token — a student can look up, adjust selections, and
- * confirm across multiple visits without ever authenticating.
+ * with the student code alone (Leng's call, 2026-09-08 — previously code +
+ * date of birth) rather than trusting a stored token — a student can look
+ * up, adjust selections, and confirm across multiple visits without ever
+ * authenticating. Single-factor by design now: anyone who knows or guesses
+ * a student code can view/change that student's registration, since codes
+ * are not random. Rate-limiting/logging on these endpoints is still an
+ * open TODO from the original design notes.
  */
 class RetakeExamPublicController extends Controller
 {
@@ -31,7 +35,7 @@ class RetakeExamPublicController extends Controller
         $student   = $this->resolveStudent($validated);
 
         if (! $student) {
-            return no_data('No matching student found. Please check the student code and date of birth.', 404);
+            return no_data('No matching student found. Please check the student code.', 404);
         }
 
         return has_data($this->buildPayload($student));
@@ -54,7 +58,7 @@ class RetakeExamPublicController extends Controller
         $student = $this->resolveStudent($validated);
 
         if (! $student) {
-            return no_data('No matching student found. Please check the student code and date of birth.', 404);
+            return no_data('No matching student found. Please check the student code.', 404);
         }
 
         foreach ($validated['selections'] as $selection) {
@@ -81,7 +85,7 @@ class RetakeExamPublicController extends Controller
         $student   = $this->resolveStudent($validated);
 
         if (! $student) {
-            return no_data('No matching student found. Please check the student code and date of birth.', 404);
+            return no_data('No matching student found. Please check the student code.', 404);
         }
 
         $pending = RetakeRegistration::query()
@@ -105,7 +109,6 @@ class RetakeExamPublicController extends Controller
     {
         return Validator::make($request->all(), array_merge([
             'code' => 'required|string|max:50',
-            'dob'  => 'required|date',
         ], $extra))->validate();
     }
 
@@ -114,7 +117,6 @@ class RetakeExamPublicController extends Controller
         return Student::query()
             ->with('person')
             ->where('code', $validated['code'])
-            ->whereHas('person', fn($q) => $q->whereDate('dob', $validated['dob']))
             ->first();
     }
 

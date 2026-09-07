@@ -8,9 +8,10 @@ class PaymentBatchRequest extends IRequest
         return array_merge(
             check_exist('student_id', 'students'),
             [
-                'invoice_path' => 'nullable|string|max:255',
-                'invoice_type' => 'nullable|string|max:30',
-                'paid_at'      => 'nullable|date',
+                // invoice_path/invoice_type/paid_at are computed server-side
+                // from the uploaded file (see PaymentBatchController::store)
+                // — SA just picks/pastes an image and writes a remark.
+                'invoice_file' => 'nullable|image|max:5120',
                 'remark'       => 'nullable|string|max:500',
             ]
         );

@@ -1,10 +1,16 @@
 <?php
 namespace App\Imports;
 
+use App\Models\Batch;
+use App\Models\Group;
 use App\Models\Lecturer;
 use App\Models\Major;
+use App\Models\Nationality;
+use App\Models\Person;
 use App\Models\RetakeBatch;
 use App\Models\RetakeRegistration;
+use App\Models\Shift;
+use App\Models\Status;
 use App\Models\Student;
 use App\Models\Subject;
 use Illuminate\Support\Collection;
@@ -75,25 +81,63 @@ class RetakeRegistrationImport implements ToCollection, WithHeadingRow
         }
 
         $student = Student::query()->where('code', $code)->first();
+        $majorId = $this->majorIndex[$this->key($majorName)] ?? null;
+
+        // --- Original strict match, commented out for local testing (2026-09-07) ---
+        // No real students exist yet in dev, so every row was being skipped.
+        // Restore this block (and delete the placeholder block below) before
+        // importing against production, where a real match is required.
+        // if (! $student) {
+        //     $this->skippedStudent[] = [
+        //         'row' => $rowNumber, 'student_code' => $code,
+        //         'reason' => 'No student found with this code.',
+        //     ];
+        //     return;
+        // }
 
         if (! $student) {
-            $this->skippedStudent[] = [
-                'row' => $rowNumber, 'student_code' => $code,
-                'reason' => 'No student found with this code.',
-            ];
-            return;
+            if (! app()->environment('local')) {
+                $this->skippedStudent[] = [
+                    'row' => $rowNumber, 'student_code' => $code,
+                    'reason' => 'No student found with this code.',
+                ];
+                return;
+            }
+
+            // Local-only: fabricate a minimal student so the import flow can
+            // be exercised end-to-end without real student data loaded yet.
+            $student = $this->createPlaceholderStudent($code, $majorId);
         }
 
-        $majorId   = $this->majorIndex[$this->key($majorName)] ?? null;
         $subjectId = $majorId ? $this->resolveSubjectId($majorId, $subjectName) : null;
 
+        // --- Original strict match, commented out for local testing (2026-09-07) ---
+        // Restore this block (and delete the placeholder block below) before
+        // importing against production, where a real subject match is
+        // required. Major still must match either way — only Subject skips.
+        // if (! $subjectId) {
+        //     $this->skippedSubject[] = [
+        //         'row' => $rowNumber, 'student_code' => $code,
+        //         'major' => $majorName, 'subject' => $subjectName,
+        //         'reason' => $majorId ? 'No subject matched that name under that major.' : 'Major not found.',
+        //     ];
+        //     return;
+        // }
+
         if (! $subjectId) {
-            $this->skippedSubject[] = [
-                'row' => $rowNumber, 'student_code' => $code,
-                'major' => $majorName, 'subject' => $subjectName,
-                'reason' => $majorId ? 'No subject matched that name under that major.' : 'Major not found.',
-            ];
-            return;
+            if (! $majorId || ! app()->environment('local')) {
+                $this->skippedSubject[] = [
+                    'row' => $rowNumber, 'student_code' => $code,
+                    'major' => $majorName, 'subject' => $subjectName,
+                    'reason' => $majorId ? 'No subject matched that name under that major.' : 'Major not found.',
+                ];
+                return;
+            }
+
+            // Local-only: fabricate a subject under the (real, matched)
+            // major so the import flow can be tested without pre-loading
+            // every subject the real file references.
+            $subjectId = $this->createPlaceholderSubject($majorId, $subjectName);
         }
 
         $lecturerId = $this->lecturerIndex[$this->key($lecturerName)] ?? null;
@@ -125,6 +169,56 @@ class RetakeRegistrationImport implements ToCollection, WithHeadingRow
                 'reason' => 'No lecturer matched this name — registration created without one.',
             ];
         }
+    }
+
+    /**
+     * Local-testing-only helper — see the "local-only" branch in
+     * processRow(). Fabricates a bare-minimum Person + Student so a
+     * registration can be created for a code that isn't in the (currently
+     * empty/sparse) local database. Picks whatever batch/group/shift/status/
+     * nationality already exists locally; never runs outside `local` env.
+     */
+    protected function createPlaceholderStudent(string $code, ?int $majorId): Student
+    {
+        $person = Person::create([
+            'first_name'     => 'Test',
+            'last_name'      => $code,
+            'first_name_kh'  => 'តេស្ត',
+            'last_name_kh'   => $code,
+            'nationality_id' => Nationality::query()->value('id'),
+            'sex'            => 'other',
+        ]);
+
+        return Student::create([
+            'person_id' => $person->id,
+            'batch_id'  => Batch::query()->value('id'),
+            'major_id'  => $majorId ?? Major::query()->value('id'),
+            'group_id'  => Group::query()->value('id'),
+            'shift_id'  => Shift::query()->value('id'),
+            'status_id' => Status::query()->value('id'),
+            'code'      => $code,
+        ]);
+    }
+
+    /**
+     * Local-testing-only helper — see the "local-only" branch in
+     * processRow(). Fabricates a Subject under a real, already-matched
+     * major so the import flow doesn't require every subject to be
+     * pre-loaded locally. Keyed on (major_id, name_en) so the same subject
+     * name repeated across rows/re-imports reuses one row instead of
+     * duplicating, and feeds subjectCache so resolveSubjectId() finds it
+     * on any later row in this same run.
+     */
+    protected function createPlaceholderSubject(int $majorId, string $subjectName): int
+    {
+        $subject = Subject::query()->updateOrCreate(
+            ['major_id' => $majorId, 'name_en' => $subjectName],
+            ['name_kh' => $subjectName]
+        );
+
+        $cacheKey = $majorId . '|' . $this->key($subjectName);
+
+        return $this->subjectCache[$cacheKey] = $subject->id;
     }
 
     protected function resolveSubjectId(int $majorId, string $subjectName): ?int
