@@ -83,6 +83,11 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->get('/retake-registrations-export', [RetakeRegistrationController::class, 'exportList'])
         ->name('retake-registrations.export');
 
+    // REG's report page — same flat-sibling reasoning as export above.
+    Route::middleware('permission:retake-registration.view')
+        ->get('/retake-registrations-report', [RetakeRegistrationController::class, 'report'])
+        ->name('retake-registrations.report');
+
     // Customer Service: read-only, registered students only — its own
     // permission, separate from REG's full retake-registration.view.
     Route::middleware('permission:retake-cs.view')

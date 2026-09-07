@@ -17,14 +17,23 @@
     <div class="space-y-4">
         {{-- Batch strip: lifecycle actions (import / close / carry-forward / telegram) --}}
         <div class="flex items-center justify-between gap-3">
-            <h3 class="text-sm font-bold text-neutral-700 dark:text-neutral-200">បាច់ (Batches)</h3>
-            <button type="button" id="retakeImportBtn"
+            <h3 class="text-sm font-bold text-neutral-700 dark:text-neutral-200">ជំនាន់ (Batches)</h3>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('retake-registration.report') }}"
+                    class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                    <svg class="w-4 h-4 mr-1.5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                    </svg>
+                    របាយការណ៍ (Report)
+                </a>
+                <button type="button" id="retakeImportBtn"
                 class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 rounded-xl shadow-md shadow-indigo-500/25 active:scale-95 transition-all duration-200">
                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                 </svg>
-                នាំចូល លើកទី១ (Import 1st Supp.)
-            </button>
+                    នាំចូល លើកទី១ (Import 1st Supp.)
+                </button>
+            </div>
         </div>
         <div id="retake-batch-strip" class="flex gap-3 overflow-x-auto pb-2">
             <p class="text-xs text-neutral-400 italic px-1">កំពុងផ្ទុក... (Loading batches...)</p>

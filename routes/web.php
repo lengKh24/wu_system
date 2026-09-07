@@ -68,6 +68,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('retake-registration.index')
         ->middleware('can:retake-registration.edit');
 
+    Route::get('/retake-exam/report', [RetakeExamController::class, 'report'])
+        ->name('retake-registration.report')
+        ->middleware('can:retake-registration.edit');
+
     // Score's own page — read the registrations list, enter/edit a score.
     // No batch, import, outcome, selection, or delete access.
     Route::get('/retake-exam/scores', [RetakeScoreController::class, 'index'])

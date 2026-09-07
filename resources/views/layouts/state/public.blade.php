@@ -218,16 +218,14 @@
         class="scroll-reveal mt-20 px-4 mb-32">
         <div class="flex flex-col items-center justify-center space-y-3">
 
-            <div class="flex items-center gap-0 opacity-40 mb-0">
-                <div class="h-px w-12 bg-pink-900/30 dark:bg-pink-400/30"></div>
-                <span class="text-pink-900 dark:text-pink-400" style="font-size: 64px">❦</span>
-                <div class="h-px w-12 bg-pink-900/30 dark:bg-pink-400/30"></div>
-            </div>
-
             <div class="text-center group transition-all duration-500 hover:scale-105">
-                <h3 class="text-gray-800 dark:text-neutral-400 tracking-[0.4em] text-[10px] uppercase mb-1">
-                    Digital Invitation by
+                <h3 class="text-gray-800 dark:text-neutral-400 tracking-[0.4em] text-[10px] uppercase mb-4">
+                    Premium Services
                 </h3>
+                <a href="https://t.me/roumdol_invite" target="_blank"
+                    class="hover-brighten mx-auto mb-3 flex items-center justify-center w-16 h-16 rounded-2xl bg-white dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-md shadow-pink-900/10 p-2 transition-transform duration-500 group-hover:scale-105">
+                    <img src="{{ asset('images/Roumdoul_Logo.png') }}" alt="Roumdoul logo" class="w-full h-full object-contain">
+                </a>
                 <div class="flex flex-col items-center">
                     <span class="my-3 text-3xl text-pink-900 dark:text-pink-400 font-bold">
                         <a href="https://t.me/roumdol_invite" target="_blank" class="hover-brighten hover:text-pink-700 dark:hover:text-pink-300 transition-colors">
@@ -265,8 +263,7 @@
             <div class="text-center">
                 <p class="text-[14px] text-gray-800 dark:text-neutral-300 uppercase tracking-tighter leading-relaxed">
                     (+855) 71 260 0078 <br />
-                    (+855) 15 57 87 07 <br />
-                    (+855) 85 949 008
+                    (+855) 15 57 87 07
                 </p>
             </div>
 

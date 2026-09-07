@@ -306,110 +306,141 @@
                             </x-sidebar-link>
                         @endcan
 
+                        @php
+                            $academicRoutes = ['faculty.*', 'major.*', 'batch.*', 'shift.*', 'group.*', 'campus.*', 'app-status.*'];
+                        @endphp
                         @canany(['faculty.view', 'major.view', 'batch.view', 'shift.view', 'group.view',
                             'app-status.view', 'campus.view'])
                             <li class="pt-4 pb-1">
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Academics</span>
                             </li>
+                            <li x-data="{ open: {{ request()->routeIs($academicRoutes) ? 'true' : 'false' }} }">
+                                <button type="button" @click="open = !open"
+                                    class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl transition-all duration-200 group
+                                    {{ request()->routeIs($academicRoutes)
+                                        ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 shadow-sm'
+                                        : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white border border-transparent' }}">
+                                    <span class="flex items-center">
+                                        <span class="transition-transform duration-200 group-hover:scale-110">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                            </svg>
+                                        </span>
+                                        <span class="ms-3 font-semibold">ការសិក្សា (Academics)</span>
+                                    </span>
+                                    <svg class="w-4 h-4 shrink-0 transition-transform duration-200"
+                                        :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+
+                                <ul x-show="open" x-cloak x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 -translate-y-1"
+                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                    x-transition:leave="transition ease-in duration-150"
+                                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                                    class="mt-1 ms-5 ps-4 border-l border-neutral-200 dark:border-white/10 space-y-1">
+
+                                    @can('faculty.view')
+                                        <x-sidebar-link route="faculty.index">
+                                            <x-slot name="icon">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                </svg>
+                                            </x-slot>
+                                            មហាវិទ្យាល័យ (Faculty)
+                                        </x-sidebar-link>
+                                    @endcan
+
+                                    @can('major.view')
+                                        <x-sidebar-link route="major.index">
+                                            <x-slot name="icon">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                                </svg>
+                                            </x-slot>
+                                            ជំនាញ (Major)
+                                        </x-sidebar-link>
+                                    @endcan
+
+                                    @can('batch.view')
+                                        <x-sidebar-link route="batch.index">
+                                            <x-slot name="icon">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 14l9-5-9-5-9 5 9 5z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                                </svg>
+                                            </x-slot>
+                                            ជំនាន់ (Batch)
+                                        </x-sidebar-link>
+                                    @endcan
+
+                                    @can('shift.view')
+                                        <x-sidebar-link route="shift.index">
+                                            <x-slot name="icon">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </x-slot>
+                                            វេន (Shift)
+                                        </x-sidebar-link>
+                                    @endcan
+
+                                    @can('group.view')
+                                        <x-sidebar-link route="group.index">
+                                            <x-slot name="icon">
+                                                {{-- <svg class="w-4.5 h-4.5 text-gray-800 dark:text-white" aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
+                                                        d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z" />
+                                                </svg> --}}
+                                            </x-slot>
+                                            ក្រុមសិក្សា (Group)
+                                        </x-sidebar-link>
+                                    @endcan
+
+                                    @can('campus.view')
+                                        <x-sidebar-link route="campus.index">
+                                            <x-slot name="icon">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" />
+                                                </svg>
+                                            </x-slot>
+                                            បរិវេណ (Campus)
+                                        </x-sidebar-link>
+                                    @endcan
+
+                                    @can('app-status.view')
+                                        <x-sidebar-link route="app-status.index">
+                                            <x-slot name="icon">
+                                                {{-- <svg class="w-4.5 h-4.5 text-gray-800 dark:text-white" aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke="currentColor" stroke-width="2"
+                                                        d="M11.083 5.104c.35-.8 1.485-.8 1.834 0l1.752 4.022a1 1 0 0 0 .84.597l4.463.342c.9.069 1.255 1.2.556 1.771l-3.33 2.723a1 1 0 0 0-.337 1.016l1.03 4.119c.214.858-.71 1.552-1.474 1.106l-3.913-2.281a1 1 0 0 0-1.008 0L7.583 20.8c-.764.446-1.688-.248-1.474-1.106l1.03-4.119A1 1 0 0 0 6.8 14.56l-3.33-2.723c-.698-.571-.342-1.702.557-1.771l4.462-.342a1 1 0 0 0 .84-.597l1.753-4.022Z" />
+                                                </svg> --}}
+                                            </x-slot>
+                                            ស្ថានភាព (Status)
+                                        </x-sidebar-link>
+                                    @endcan
+                                </ul>
+                            </li>
                         @endcanany
-
-                        @can('faculty.view')
-                            <x-sidebar-link route="faculty.index">
-                                <x-slot name="icon">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                    </svg>
-                                </x-slot>
-                                មហាវិទ្យាល័យ (Faculty)
-                            </x-sidebar-link>
-                        @endcan
-
-                        @can('major.view')
-                            <x-sidebar-link route="major.index">
-                                <x-slot name="icon">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                    </svg>
-                                </x-slot>
-                                ជំនាញ (Major)
-                            </x-sidebar-link>
-                        @endcan
-
-                        @can('batch.view')
-                            <x-sidebar-link route="batch.index">
-                                <x-slot name="icon">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 14l9-5-9-5-9 5 9 5z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                                    </svg>
-                                </x-slot>
-                                ជំនាន់ (Batch)
-                            </x-sidebar-link>
-                        @endcan
-
-                        @can('shift.view')
-                            <x-sidebar-link route="shift.index">
-                                <x-slot name="icon">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </x-slot>
-                                វេន (Shift)
-                            </x-sidebar-link>
-                        @endcan
-
-                        @can('group.view')
-                            <x-sidebar-link route="group.index">
-                                <x-slot name="icon">
-                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                        viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
-                                            d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z" />
-                                    </svg>
-                                </x-slot>
-                                ក្រុមសិក្សា (Group)
-                            </x-sidebar-link>
-                        @endcan
-
-                        @can('campus.view')
-                            <x-sidebar-link route="campus.index">
-                                <x-slot name="icon">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" />
-                                    </svg>
-                                </x-slot>
-                                បរិវេណ (Campus)
-                            </x-sidebar-link>
-                        @endcan
-
-                        @can('app-status.view')
-                            <x-sidebar-link route="app-status.index">
-                                <x-slot name="icon">
-                                    <svg class="w-[19px] h-[19px] text-gray-800 dark:text-white" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                        viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-width="2"
-                                            d="M11.083 5.104c.35-.8 1.485-.8 1.834 0l1.752 4.022a1 1 0 0 0 .84.597l4.463.342c.9.069 1.255 1.2.556 1.771l-3.33 2.723a1 1 0 0 0-.337 1.016l1.03 4.119c.214.858-.71 1.552-1.474 1.106l-3.913-2.281a1 1 0 0 0-1.008 0L7.583 20.8c-.764.446-1.688-.248-1.474-1.106l1.03-4.119A1 1 0 0 0 6.8 14.56l-3.33-2.723c-.698-.571-.342-1.702.557-1.771l4.462-.342a1 1 0 0 0 .84-.597l1.753-4.022Z" />
-                                    </svg>
-
-
-                                </x-slot>
-                                ស្ថានភាព (Status)
-                            </x-sidebar-link>
-                        @endcan
 
                         {{-- @can('state-exam.view')
                         <x-ui.side-link title="Sample" :options="[
@@ -418,47 +449,79 @@
                         ]" />
                         @endcan --}}
 
+                        @php
+                            $administrationRoutes = ['role.*', 'activity.*', 'register'];
+                        @endphp
                         @can('role.view')
                             <li class="pt-4 pb-1">
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Administration</span>
                             </li>
-                            <x-sidebar-link route="role.index">
-                                <x-slot name="icon">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M9 12a3 3 0 100-6 3 3 0 000 6zM17.804 21c.512-.75.79-1.638.79-2.556C18.594 15.36 15.964 13 12.75 13H12a4.5 4.5 0 00-4.5 4.5c0 .918.278 1.806.79 2.556M15 6a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <li x-data="{ open: {{ request()->routeIs($administrationRoutes) ? 'true' : 'false' }} }">
+                                <button type="button" @click="open = !open"
+                                    class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl transition-all duration-200 group
+                                    {{ request()->routeIs($administrationRoutes)
+                                        ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 shadow-sm'
+                                        : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white border border-transparent' }}">
+                                    <span class="flex items-center">
+                                        <span class="transition-transform duration-200 group-hover:scale-110">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </span>
+                                        <span class="ms-3 font-semibold">រដ្ឋបាល (Administration)</span>
+                                    </span>
+                                    <svg class="w-4 h-4 shrink-0 transition-transform duration-200"
+                                        :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
-                                </x-slot>
-                                តួនាទី និងសិទ្ធិ (Roles & Permissions)
-                            </x-sidebar-link>
-                        @endcan
+                                </button>
 
-                        @can('activity.view')
-                            <x-sidebar-link route="activity.index">
-                                <x-slot name="icon">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </x-slot>
-                                កំណត់ត្រាសកម្មភាព (Activity Log)
-                            </x-sidebar-link>
-                        @endcan
+                                <ul x-show="open" x-cloak x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 -translate-y-1"
+                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                    x-transition:leave="transition ease-in duration-150"
+                                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                                    class="mt-1 ms-5 ps-4 border-l border-neutral-200 dark:border-white/10 space-y-1">
 
-                        @can('role.view')
-                            <x-sidebar-link route="register">
-                                <x-slot name="icon">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
-                                    </svg>
-                                </x-slot>
-                                បង្កើតគណនីថ្មី (Create Account)
-                            </x-sidebar-link>
+                                    <x-sidebar-link route="role.index">
+                                        <x-slot name="icon">
+                                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M9 12a3 3 0 100-6 3 3 0 000 6zM17.804 21c.512-.75.79-1.638.79-2.556C18.594 15.36 15.964 13 12.75 13H12a4.5 4.5 0 00-4.5 4.5c0 .918.278 1.806.79 2.556M15 6a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </x-slot>
+                                        តួនាទី និងសិទ្ធិ (Roles & Permissions)
+                                    </x-sidebar-link>
+
+                                    @can('activity.view')
+                                        <x-sidebar-link route="activity.index">
+                                            <x-slot name="icon">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </x-slot>
+                                            កំណត់ត្រាសកម្មភាព (Activity Log)
+                                        </x-sidebar-link>
+                                    @endcan
+
+                                    <x-sidebar-link route="register">
+                                        <x-slot name="icon">
+                                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                                            </svg>
+                                        </x-slot>
+                                        បង្កើតគណនីថ្មី (Create Account)
+                                    </x-sidebar-link>
+                                </ul>
+                            </li>
                         @endcan
 
                     </ul>

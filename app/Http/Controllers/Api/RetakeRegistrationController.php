@@ -55,6 +55,61 @@ class RetakeRegistrationController extends Controller
     }
 
     /**
+     * REG's report page — aggregate counts only (outcome/payment, overall
+     * and per exam type), scoped to confirmed registrations (registered_at
+     * set) same as every other reporting/payment view in this module.
+     * Optional retake_term_id narrows to one cohort's term.
+     */
+    public function report(Request $request)
+    {
+        $validated = $request->validate([
+            'retake_term_id' => 'nullable|integer|exists:retake_terms,id',
+        ]);
+
+        $base = RetakeRegistration::query()->whereNotNull('registered_at');
+        if ($termId = $validated['retake_term_id'] ?? null) {
+            $base->where('retake_term_id', $termId);
+        }
+
+        $totalConfirmed = (clone $base)->count();
+        $outcomeCounts  = (clone $base)->selectRaw('outcome, count(*) as total')->groupBy('outcome')->pluck('total', 'outcome');
+        $paymentCounts  = (clone $base)->selectRaw('payment_status, count(*) as total')->groupBy('payment_status')->pluck('total', 'payment_status');
+
+        $byExamType = (clone $base)
+            ->join('exam_types', 'exam_types.id', '=', 'retake_registrations.exam_type_id')
+            ->selectRaw('
+                exam_types.id as exam_type_id,
+                exam_types.name_en as exam_type_name,
+                exam_types.code as exam_type_code,
+                count(*) as total,
+                sum(case when retake_registrations.outcome = ? then 1 else 0 end) as passed,
+                sum(case when retake_registrations.outcome = ? then 1 else 0 end) as failed,
+                sum(case when retake_registrations.outcome = ? then 1 else 0 end) as absent,
+                sum(case when retake_registrations.outcome = ? then 1 else 0 end) as pending,
+                sum(case when retake_registrations.payment_status = ? then 1 else 0 end) as paid,
+                sum(case when retake_registrations.payment_status = ? then 1 else 0 end) as unpaid
+            ', [
+                RetakeRegistration::OUTCOME_PASSED, RetakeRegistration::OUTCOME_FAILED,
+                RetakeRegistration::OUTCOME_ABSENT, RetakeRegistration::OUTCOME_PENDING,
+                RetakeRegistration::PAYMENT_PAID, RetakeRegistration::PAYMENT_UNPAID,
+            ])
+            ->groupBy('exam_types.id', 'exam_types.name_en', 'exam_types.code')
+            // These rows aren't real registrations — hide status_note (an
+            // appended per-row accessor) so it doesn't fire its own
+            // extra lookup query and leak a meaningless value into the
+            // aggregate output.
+            ->get()
+            ->makeHidden('status_note');
+
+        return has_data([
+            'total_confirmed' => $totalConfirmed,
+            'outcome_counts'  => $outcomeCounts,
+            'payment_counts'  => $paymentCounts,
+            'by_exam_type'    => $byExamType,
+        ]);
+    }
+
+    /**
      * Customer Service's read-only view — students who have actually
      * registered (registered_at set). Gated by its own 'retake-cs.view'
      * permission, separate from REG's 'retake-registration.view'.

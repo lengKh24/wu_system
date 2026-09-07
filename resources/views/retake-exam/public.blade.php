@@ -103,6 +103,90 @@
      element nested inside <main>'s stacking context can't paint above the
      footer, so this lives outside it, in the layout's 'modals' stack. --}}
 <div id="retakeToastStack" class="fixed top-5 right-5 z-[70] flex flex-col gap-2 w-[calc(100%-2.5rem)] max-w-sm"></div>
+
+{{-- Roumdoul promo splash — shown on every visit for 3s, then fades away
+     on its own (Leng's call: this is the university's own student-facing
+     page, so a promo shouldn't force a click to get past it). Same
+     logo/wordmark/socials/phone numbers as this layout's own footer, just
+     presented up front instead of at the bottom of the page. Lives in the
+     'modals' stack for the same z-index/stacking reason as the toast
+     stack above. --}}
+<div id="retakeSplash" class="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto bg-white dark:bg-neutral-950 py-10">
+    <div id="retakeSplashContent" class="text-center px-6 w-full max-w-sm splash-pop">
+        <h3 class="text-neutral-400 dark:text-neutral-500 tracking-[0.35em] text-[10px] uppercase mb-5">
+            Premium Services
+        </h3>
+
+        <div class="mx-auto mb-5 flex items-center justify-center w-28 h-28 rounded-3xl bg-white dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-xl shadow-pink-900/10 p-3">
+            <img src="{{ asset('images/Roumdoul_Logo.png') }}" alt="Roumdoul logo" class="w-full h-full object-contain">
+        </div>
+
+        <div class="text-3xl font-bold text-pink-900 dark:text-pink-400 tracking-tight">រំដួល</div>
+        <div class="mt-1 text-xs font-bold text-pink-900/80 dark:text-pink-400/80 tracking-[0.35em] uppercase">Roumdoul</div>
+
+        <div class="flex items-center justify-center gap-5 mt-6">
+            <a href="https://www.facebook.com/share/1AoKyVb4t3/?mibextid=wwXIfr" target="_blank" rel="noopener"
+                class="hover-brighten flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 opacity-70 hover:opacity-100 hover:-translate-y-0.5 hover:scale-110">
+                <img src="https://img.icons8.com/material-rounded/48/831843/facebook-f.png" class="w-5 h-5" alt="Facebook">
+            </a>
+            <a href="https://www.instagram.com/roumd_oul" target="_blank" rel="noopener"
+                class="hover-brighten flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 opacity-70 hover:opacity-100 hover:-translate-y-0.5 hover:scale-110">
+                <img src="https://img.icons8.com/material-rounded/48/831843/instagram-new.png" class="w-5 h-5" alt="Instagram">
+            </a>
+            <a href="https://www.tiktok.com/@roum_doul?_r=1&_t=ZS-92Nr8NVeJhE" target="_blank" rel="noopener"
+                class="hover-brighten flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 opacity-70 hover:opacity-100 hover:-translate-y-0.5 hover:scale-110">
+                <img src="https://img.icons8.com/material-rounded/48/831843/tiktok.png" class="w-5 h-5" alt="TikTok">
+            </a>
+            <a href="https://t.me/roumdoul_official" target="_blank" rel="noopener"
+                class="hover-brighten flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 opacity-70 hover:opacity-100 hover:-translate-y-0.5 hover:scale-110">
+                <img src="https://img.icons8.com/material-rounded/48/831843/telegram-app.png" class="w-5 h-5" alt="Telegram">
+            </a>
+        </div>
+
+        <p class="mt-5 text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-tight leading-relaxed">
+            (+855) 71 260 0078 <br>
+            (+855) 15 57 87 07
+        </p>
+    </div>
+</div>
+
+<style>
+    #retakeSplash {
+        transition: opacity .5s cubic-bezier(.4,0,.2,1);
+    }
+    #retakeSplash.splash-hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .splash-pop {
+        animation: splashPop .8s cubic-bezier(.34,1.56,.64,1) both;
+    }
+
+    @keyframes splashPop {
+        from { opacity: 0; transform: scale(.8) translateY(8px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        #retakeSplash { transition: none; }
+        .splash-pop { animation: none; }
+    }
+</style>
+
+<script>
+    // Shown on every visit — holds for 3s, then fades out on its own and
+    // is removed so it never intercepts clicks on the real page underneath.
+    window.addEventListener('load', function () {
+        var splash = document.getElementById('retakeSplash');
+        if (!splash) return;
+
+        setTimeout(function () {
+            splash.classList.add('splash-hide');
+            setTimeout(function () { splash.remove(); }, 550);
+        }, 3000);
+    });
+</script>
 @endpush
 
 @push('scripts')

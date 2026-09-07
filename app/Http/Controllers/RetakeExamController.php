@@ -13,4 +13,13 @@ class RetakeExamController extends Controller
     {
         return view('retake-exam.registrations.index');
     }
+
+    /**
+     * REG's report — outcome/payment KPIs and a per-exam-type breakdown,
+     * same gating as the Main List (retake-registration.edit).
+     */
+    public function report()
+    {
+        return view('retake-exam.report.index');
+    }
 }
