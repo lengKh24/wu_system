@@ -11,6 +11,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RetakeExamPublicController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StatusController;
@@ -28,6 +29,10 @@ Route::prefix('state-exam/attendance')->name('state-exam.attendance.')->group(fu
 });
 
 Route::get('/state-exam/invigilators', [StateExamController::class, 'invigilators'])->name('state-exam.invigilators.index');
+
+// Public — student self-service retake-exam registration, no login
+// required. JSON actions live in routes/api.php's public group.
+Route::get('/retake-exam', [RetakeExamPublicController::class, 'index'])->name('retake-exam.index');
 
 Route::middleware(['auth'])->group(function () {
     // This is the missing piece that connects to your Controller

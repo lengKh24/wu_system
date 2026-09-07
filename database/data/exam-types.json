@@ -1,0 +1,30 @@
+[
+    {
+        "code": "1st_supplementary",
+        "name_kh": "ប្រឡងសង លើកទី១",
+        "name_en": "1st Supplementary",
+        "requires_import": true,
+        "uses_term": true
+    },
+    {
+        "code": "2nd_supplementary",
+        "name_kh": "ប្រឡងសង លើកទី២",
+        "name_en": "2nd Supplementary",
+        "requires_import": false,
+        "uses_term": true
+    },
+    {
+        "code": "restudy",
+        "name_kh": "រៀនសង",
+        "name_en": "Restudy",
+        "requires_import": false,
+        "uses_term": true
+    },
+    {
+        "code": "special",
+        "name_kh": "ប្រឡងពិសេស",
+        "name_en": "Special",
+        "requires_import": false,
+        "uses_term": false
+    }
+]

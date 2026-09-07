@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             TermSeeder::class,
             StudentSeeder::class,
             ExamStateSeeder::class,
+            ExamTypeSeeder::class,
             PermissionSeeder::class,
         ]);
     }
