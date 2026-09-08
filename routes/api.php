@@ -168,6 +168,16 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         Route::get('/users', [ActivityLogController::class, 'users'])->name('users');
     });
 
+    // Flat sibling routes for students — registered before api_routes()'s
+    // /students/{student} wildcard below so "export"/"import" are never
+    // swallowed as an id (same reasoning as retake-registrations-export).
+    Route::middleware('permission:student.view')
+        ->get('/students-export', [StudentController::class, 'exportList'])
+        ->name('students.export');
+    Route::middleware('permission:student.create')
+        ->post('/students-import', [StudentController::class, 'importFile'])
+        ->name('students.import');
+
     // Register API resource routes for various controllers
     api_routes([
         'faculties'       => FacultyController::class,

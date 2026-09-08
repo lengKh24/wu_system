@@ -1,12 +1,15 @@
 <?php
 namespace App\Http\Controllers\Api;
 
+use App\Exports\StudentExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StudentRequest;
 use App\Http\Resources\StudentResource;
+use App\Imports\StudentImport;
 use App\Models\Person;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
 {
@@ -43,6 +46,38 @@ class StudentController extends Controller
 
             return $query;
         });
+    }
+
+    /**
+     * Exports whatever the list is currently filtered to (search/payment) —
+     * same filter contract as index() above. Named exportList, not export,
+     * since export(object, string) is a reserved method name on the base
+     * Controller (see RetakeBatchController::importFile()'s docblock for
+     * the same reasoning — reusing a base method name with an
+     * incompatible signature is a fatal error, not a warning).
+     */
+    public function exportList(Request $request)
+    {
+        return $this->export(
+            new StudentExport($request->only(['search', 'payment'])),
+            'students'
+        );
+    }
+
+    /**
+     * Bulk enrollment import — see StudentImport's docblock for the exact
+     * column contract and what gets skipped vs created.
+     */
+    public function importFile(Request $request)
+    {
+        $validated = $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new StudentImport();
+        Excel::import($import, $validated['file']);
+
+        return has_data(['report' => $import->report()], 'Import complete.');
     }
 
     /**
