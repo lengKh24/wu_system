@@ -44,12 +44,13 @@ export function renderTable(dom, rows) {
 
 function renderRow(row, index) {
     const student = row.student ?? {};
+    const subject = row.subject ?? {};
     const term = row.term ?? {};
     const examType = row.exam_type ?? {};
 
     const studentName = escapeHtml(student.name || student.name_en || 'N/A');
     const studentCode = escapeHtml(student.code ?? '');
-    const subjectName = escapeHtml(row.subject || 'N/A');
+    const subjectName = escapeHtml(subject.name || subject.name_en || subject.code || 'N/A');
     const termTitle = escapeHtml(term.title ?? '—');
     const examTypeName = escapeHtml(examType.name_en || examType.code || '—');
 

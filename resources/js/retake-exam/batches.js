@@ -279,6 +279,13 @@ function renderImportResults(dom, report) {
             (r) => [r.row, r.student_code, r.reason]
         ),
         importIssueTable(
+            'មុខវិជ្ជាមិនត្រូវគ្នា (Subject not matched)',
+            'rose',
+            report.skipped_subject,
+            ['Row', 'Student Code', 'Major', 'Subject', 'Reason'],
+            (r) => [r.row, r.student_code, r.major, r.subject, r.reason]
+        ),
+        importIssueTable(
             'សាស្ត្រាចារ្យមិនត្រូវគ្នា — បានបង្កើតដោយគ្មានឈ្មោះ (Lecturer not matched — row still created)',
             'amber',
             report.flagged_lecturer,

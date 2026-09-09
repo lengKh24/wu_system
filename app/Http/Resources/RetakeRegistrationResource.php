@@ -10,7 +10,7 @@ class RetakeRegistrationResource extends IResource
             'student'   => new StudentResource($this->whenLoaded('student')),
             'term'      => new RetakeTermResource($this->whenLoaded('term')),
             'exam_type' => new ExamTypeResource($this->whenLoaded('examType')),
-            'subject'   => $this->subject,
+            'subject'   => new SubjectResource($this->whenLoaded('subject')),
             'lecturer'  => new LecturerResource($this->whenLoaded('lecturer')),
 
             // Per-batch computed count label — see

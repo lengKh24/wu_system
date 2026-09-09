@@ -22,7 +22,7 @@ class RetakeRegistration extends IModel
     public const PASSING_SCORE = 50;
 
     protected $fillable = [
-        'batch_id', 'student_id', 'retake_term_id', 'exam_type_id', 'subject', 'lecturer_id',
+        'batch_id', 'student_id', 'retake_term_id', 'exam_type_id', 'subject_id', 'lecturer_id',
         'previous_registration_id', 'previous_deletion_log_id',
         'is_selected', 'registered_at',
         'payment_status', 'payment_batch_id',
@@ -30,11 +30,10 @@ class RetakeRegistration extends IModel
         'remark',
     ];
 
-    // Most other columns are FK ids, not worth matching on — search by
-    // student code and subject (own plain-text column) instead (see
-    // Builder::macro('whereLike')).
+    // Own columns are almost all FK ids, not worth matching on — search by
+    // student code and subject name instead (see Builder::macro('whereLike')).
     protected array $searchable = [
-        'student.code', 'subject', 'remark',
+        'student.code', 'subject.name_en', 'subject.name_kh', 'remark',
     ];
 
     protected $casts = [
@@ -63,6 +62,11 @@ class RetakeRegistration extends IModel
     public function examType()
     {
         return $this->belongsTo(ExamType::class);
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
     }
 
     public function lecturer()
