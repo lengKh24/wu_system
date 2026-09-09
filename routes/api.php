@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AlertController;
 use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\CampusController;
 use App\Http\Controllers\Api\CertificateController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExamStateController;
 use App\Http\Controllers\Api\ExamTypeController;
 use App\Http\Controllers\Api\FacultyController;
@@ -58,6 +59,10 @@ Route::prefix('v1/retake-exam')->name('retake-exam-public.')->group(function () 
 });
 
 Route::prefix('v1')->middleware('auth')->group(function () {
+    // No permission gate — matches the /dashboard page itself, which is
+    // visible to any authenticated user regardless of role.
+    Route::get('/dashboard/report', [DashboardController::class, 'report'])->name('dashboard.report');
+
     // Custom API routes for specific controllers
     Route::prefix('certificates')->name('certificates.')->group(function () {
         Route::get('/preview-number', [CertificateController::class, 'preview'])->name('preview');
@@ -177,6 +182,9 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:student.create')
         ->post('/students-import', [StudentController::class, 'importFile'])
         ->name('students.import');
+    Route::middleware('permission:student.delete')
+        ->delete('/students-bulk-destroy', [StudentController::class, 'bulkDestroy'])
+        ->name('students.bulk-destroy');
 
     // Register API resource routes for various controllers
     api_routes([

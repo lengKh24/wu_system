@@ -7,7 +7,7 @@ class StatusRequest extends IRequest
     {
         return array_merge(
             DEFAULT_VALIDATE,
-            check_unique('shortcut', 'statuses')
+            check_unique('statuses', 'shortcut', true)
         );
     }
 }

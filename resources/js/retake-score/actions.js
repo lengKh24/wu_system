@@ -12,9 +12,8 @@ export function openScoreModal(dom, row) {
     state.scoringId = row.id;
 
     const student = row.student ?? {};
-    const subject = row.subject ?? {};
     if (dom.scoreContext) {
-        dom.scoreContext.innerHTML = `${escapeHtml(student.name || student.code || '—')} — ${escapeHtml(subject.name || subject.code || '—')}`;
+        dom.scoreContext.innerHTML = `${escapeHtml(student.name || student.code || '—')} — ${escapeHtml(row.subject || '—')}`;
     }
     if (dom.scoreValueInput) dom.scoreValueInput.value = row.score ?? '';
     if (dom.scoreRemarkInput) dom.scoreRemarkInput.value = '';

@@ -7,7 +7,7 @@ class GroupRequest extends IRequest
     {
         return array_merge(
             DEFAULT_VALIDATE,
-            check_unique('shortcut', 'groups')
+            check_unique('groups', 'shortcut', true)
         );
     }
 }

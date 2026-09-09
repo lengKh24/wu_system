@@ -1,0 +1,782 @@
+{
+  "info": {
+    "_postman_id": "63dda07f-7c50-42e2-9eb7-81045d5cc646",
+    "name": "WU System — Seed Majors",
+    "description": "Standalone collection to create the majors list Leng provided, via the existing Major CRUD endpoint (POST /api/v1/majors). Not part of the wu_system codebase — just a Postman collection for manual/API-side data entry.\n\nAuth: this app uses Laravel Breeze session auth (not token-based), so requests need a valid session cookie + the matching X-XSRF-TOKEN header. Run '1. Get CSRF Cookie' then '2. Login' once (per Postman session) before running the Seed Majors folder — Postman's cookie jar carries the session forward automatically for the rest of the collection.\n\nBefore running:\n- Set 'base_url' to your local/dev URL (e.g. http://localhost:8000).\n- Set 'email' / 'password' to a real user with the 'major.create' permission (an Admin account works).\n- Set 'faculty_id' to a real, existing faculty ID — every major here needs one; if these 17 majors span more than one faculty, edit faculty_id per request instead of using the shared variable.\n- Fill in each request's 'name_kh' — left as a placeholder since the Khmer names weren't provided.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "email",
+      "value": "admin@system.me"
+    },
+    {
+      "key": "password",
+      "value": "CHANGE_ME"
+    },
+    {
+      "key": "faculty_id",
+      "value": "1"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Attach the XSRF-TOKEN cookie (set by Laravel's VerifyCsrfToken middleware",
+          "// on any 'web' route response) as the X-XSRF-TOKEN header, the same way",
+          "// Laravel's own front-end (axios) does it for stateful/session requests.",
+          "const base = pm.collectionVariables.get('base_url');",
+          "const jar = pm.cookies.jar();",
+          "if (base) {",
+          "    jar.get(base, 'XSRF-TOKEN', (err, token) => {",
+          "        if (!err && token) {",
+          "            pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: decodeURIComponent(token) });",
+          "        }",
+          "    });",
+          "}",
+          ""
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "1. Get CSRF Cookie",
+          "id": "f6af5544-71e1-4c78-b8aa-42b2fca50af3",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Loads the login page once so Laravel's VerifyCsrfToken middleware sets the XSRF-TOKEN cookie in Postman's cookie jar. Run this once before logging in."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Login",
+          "id": "bb766f60-2946-4e1a-b68d-c61b597f8dc9",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "{{email}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Logs in via Breeze's default session-based login. The X-XSRF-TOKEN header is attached automatically by the collection's pre-request script, using the cookie captured in step 1."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Seed Majors",
+      "item": [
+        {
+          "name": "Create Major — Accounting",
+          "id": "fceb270e-18cb-454b-a267-73214a3f3b8c",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Accounting\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"ACC\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Accounting' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Architecture",
+          "id": "fd9c6766-acf0-44ba-aab3-f29ecfc6ab7d",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Architecture\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"ARCH\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Architecture' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Civil Engineering",
+          "id": "21bdbd58-8332-4559-9742-7b28679fd331",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Civil Engineering\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"CE\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Civil Engineering' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Computer Science",
+          "id": "bf821f40-7082-478f-bb27-b7900b8dcbb2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Computer Science\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"CS\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Computer Science' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Computer Networking and Technology",
+          "id": "460dbb1b-70bb-41d2-9fca-32a1d194517c",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Computer Networking and Technology\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"CNT\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Computer Networking and Technology' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Design and Creative Arts",
+          "id": "6e78ee7f-ec5c-4815-af11-a0008984a26c",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Design and Creative Arts\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"DCA\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Design and Creative Arts' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Digital Innovation Management",
+          "id": "f7f8ec9b-2d1d-4cf3-90a5-5177c7da6832",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Digital Innovation Management\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"DIM\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Digital Innovation Management' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Economic Development",
+          "id": "32e5cf86-deff-48f8-ba5b-630794dbab84",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Economic Development\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"ECD\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Economic Development' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — English for Communication",
+          "id": "b7232bf1-9028-49fe-a7f1-8fe88e854609",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"English for Communication\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"ENGCOM\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'English for Communication' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Banking and Finance",
+          "id": "6fae26fa-5341-4a0e-abdd-15c5d09eafed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Banking and Finance\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"FIN\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Banking and Finance' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — International Relations",
+          "id": "fb467d3c-9ea6-4251-8543-e673eeb653cd",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"International Relations\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"IR\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'International Relations' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Law",
+          "id": "de030fdc-497c-4aab-b842-a6a539866c53",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Law\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"LAW\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Law' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Management",
+          "id": "eb167814-c013-49fd-b50d-e0cc35dd7f92",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Management\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"MGT\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Management' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Marketing",
+          "id": "077695b1-72fc-49e1-81e8-45af857e0ad8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Marketing\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"MKT\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Marketing' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Public Administration",
+          "id": "10ed5df7-18c8-4de9-ac5c-4ffd718bc4a0",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Public Administration\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"PA\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Public Administration' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — TESOL",
+          "id": "fb133abd-44b6-4912-bc61-043042996f87",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"TESOL\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"TESOL\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'TESOL' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Major — Tourism",
+          "id": "3c08d56d-3054-4ff5-9a7d-2c3b22cdb6ba",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Tourism\",\n    \"name_kh\": \"TODO - Khmer name\",\n    \"shortcut\": \"TOUR\",\n    \"faculty_id\": \"{{faculty_id}}\",\n    \"remark\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/majors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "majors"
+              ]
+            },
+            "description": "Creates the 'Tourism' major. Requires 'major.create' permission on the logged-in user/role. Double-check name_kh and shortcut before sending — both are placeholders."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

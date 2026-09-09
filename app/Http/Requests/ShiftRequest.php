@@ -7,7 +7,7 @@ class ShiftRequest extends IRequest
     {
         return array_merge(
             DEFAULT_VALIDATE,
-            check_unique('shortcut', 'shifts')
+            check_unique('shifts', 'shortcut', true)
         );
     }
 }

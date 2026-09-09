@@ -7,7 +7,7 @@ class FacultyRequest extends IRequest
     {
         return array_merge(
             DEFAULT_VALIDATE,
-            check_unique('shortcut', 'faculties')
+            check_unique('faculties', 'shortcut', true)
         );
     }
 }

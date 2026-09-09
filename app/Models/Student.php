@@ -23,6 +23,7 @@ class Student extends IModel
             'major_id',
             'group_id',
             'shift_id',
+            'campus_id',
             'status_id',
             'code',
             'payment_as',
@@ -96,6 +97,11 @@ class Student extends IModel
     public function group()
     {
         return $this->belongsTo(Group::class);
+    }
+
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class);
     }
 
     public function certificates()

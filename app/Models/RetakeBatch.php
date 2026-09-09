@@ -96,7 +96,7 @@ class RetakeBatch extends IModel
                     'student_id'               => $registration->student_id,
                     'retake_term_id'           => $next->retake_term_id,
                     'exam_type_id'             => $nextType->id,
-                    'subject_id'               => $registration->subject_id,
+                    'subject'                  => $registration->subject,
                     'lecturer_id'              => $registration->lecturer_id,
                     'previous_registration_id' => $registration->id,
                     // Opt-in, not opt-out (Leng's call, 2026-09-07): a
@@ -120,7 +120,7 @@ class RetakeBatch extends IModel
                     'student_id'               => $log->student_id,
                     'retake_term_id'           => $next->retake_term_id,
                     'exam_type_id'             => $nextType->id,
-                    'subject_id'               => $log->subject_id,
+                    'subject'                  => $log->subject,
                     'previous_deletion_log_id' => $log->id,
                     // Opt-in — see the matching note in the loop above.
                     'is_selected'              => false,

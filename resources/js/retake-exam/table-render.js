@@ -48,7 +48,6 @@ export function renderTable(dom, permissions, rows) {
 
 function renderRow(row, index, permissions) {
     const student = row.student ?? {};
-    const subject = row.subject ?? {};
     const lecturer = row.lecturer ?? {};
     const term = row.term ?? {};
     const examType = row.exam_type ?? {};
@@ -58,7 +57,7 @@ function renderRow(row, index, permissions) {
     const restudyBadge = student.is_restudy
         ? badge('RESTUDY', 'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-500/10 dark:text-fuchsia-400')
         : '';
-    const subjectName = escapeHtml(subject.name || subject.name_en || subject.code || 'N/A');
+    const subjectName = escapeHtml(row.subject || 'N/A');
     const lecturerName = escapeHtml(lecturer.name || lecturer.name_en || '—');
     const termTitle = escapeHtml(term.title ?? '—');
     const examTypeName = escapeHtml(examType.name_en || examType.code || '—');

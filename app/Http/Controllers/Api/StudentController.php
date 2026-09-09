@@ -23,6 +23,7 @@ class StudentController extends Controller
             'batch',
             'major',
             'shift',
+            'campus',
             'major.faculty',
             'group',
             'status',
@@ -75,7 +76,13 @@ class StudentController extends Controller
         ]);
 
         $import = new StudentImport();
-        Excel::import($import, $validated['file']);
+
+        try {
+            Excel::import($import, $validated['file']);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Student import failed', ['error' => $e->getMessage()]);
+            return no_data('The file could not be processed. Please check it is a valid, correctly formatted spreadsheet.', 422);
+        }
 
         return has_data(['report' => $import->report()], 'Import complete.');
     }
@@ -162,6 +169,49 @@ class StudentController extends Controller
             $student->person->delete();
 
             return has_data(null, 'Moved to trash.');
+        });
+    }
+
+    /**
+     * Permanently delete multiple students in one request (same hard-delete
+     * behavior as destroy() above). Pass {"all": true} to wipe every student
+     * instead of listing ids individually.
+     *
+     * Deletes via the "people" table rather than looping per-student: people
+     * -> students, and students -> guardians, are both cascadeOnDelete at
+     * the DB level (see create_students_table / create_guardians_table
+     * migrations), and addresses cascade on person_id — so one raw delete
+     * on people cascades through all of it. This bypasses Eloquent's
+     * SoftDeletes on Person (its ->delete() would only set deleted_at, which
+     * does NOT fire the FK cascade), which is required to actually trigger
+     * removal of the dependent rows.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'all'   => 'sometimes|boolean',
+            'ids'   => 'sometimes|array|min:1',
+            'ids.*' => 'integer|exists:students,id',
+        ]);
+
+        $all = $validated['all'] ?? false;
+        if (! $all && empty($validated['ids'])) {
+            return no_data('Either "ids" (non-empty array) or "all": true is required.', 422);
+        }
+
+        return execute(function () use ($validated, $all) {
+            $query = Student::withTrashed();
+
+            if (! $all) {
+                $query->whereIn('id', $validated['ids']);
+            }
+
+            $personIds = $query->pluck('person_id');
+            $count     = $personIds->count();
+
+            \Illuminate\Support\Facades\DB::table('people')->whereIn('id', $personIds)->delete();
+
+            return has_data(null, "{$count} student(s) permanently deleted.");
         });
     }
 }

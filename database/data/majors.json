@@ -1,36 +1,104 @@
 [
-    {
-        "faculty_id": 1,
-        "name_kh": "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
-        "name_en": "Computer Science",
-        "shortcut": "CS",
-        "remark": "Focuses on software engineering and AI"
-    },
-    {
-        "faculty_id": 1,
-        "name_kh": "ព័ត៌មានវិទ្យា",
-        "name_en": "Information Technology",
-        "shortcut": "IT",
-        "remark": "Focuses on network administration and infrastructure"
-    },
-    {
-        "faculty_id": 2,
-        "name_kh": "វិស្វកម្មស៊ីវិល",
-        "name_en": "Civil Engineering",
-        "shortcut": "CE"
-    },
-    {
-        "faculty_id": 3,
-        "name_kh": "គ្រប់គ្រងពាណិជ្ជកម្ម",
-        "name_en": "Business Administration",
-        "shortcut": "BA",
-        "remark": "Highly requested major"
-    },
-    {
-        "faculty_id": 5,
-        "name_kh": "អក្សរសាស្ត្រអង់គ្លេស",
-        "name_en": "English Literature",
-        "shortcut": "EL",
-        "remark": null
-    }
+  {
+    "faculty_id": 1,
+    "name_kh": "គណនេយ្យ",
+    "name_en": "Accounting",
+    "shortcut": "Acc"
+  },
+  {
+    "faculty_id": 2,
+    "name_kh": "ស្ថាបត្យកម្ម",
+    "name_en": "Architecture",
+    "shortcut": "Arc"
+  },
+  {
+    "faculty_id": 2,
+    "name_kh": "សំណង់ស៊ីវិល",
+    "name_en": "Civil Engineering",
+    "shortcut": "CE"
+  },
+  {
+    "faculty_id": 3,
+    "name_kh": "វិទ្យាសាស្រ្តកុំព្យូទ័រ",
+    "name_en": "Computer Science",
+    "shortcut": "CS"
+  },
+  {
+    "faculty_id": 3,
+    "name_kh": "គ្រប់គ្រងបណ្តាញកុំព្យូទ័រ",
+    "name_en": "Computer Networking and Technology",
+    "shortcut": "CNT"
+  },
+  {
+    "faculty_id": 5,
+    "name_kh": "សិល្បៈ រចនា និងការច្នៃប្រឌិត",
+    "name_en": "Design and Creative Arts",
+    "shortcut": "DCA"
+  },
+  {
+    "faculty_id": 1,
+    "name_kh": "គ្រប់គ្រងបច្ចេកវិទ្យានវានុវត្តន៍",
+    "name_en": "Digital Innovation Management",
+    "shortcut": "DIM"
+  },
+  {
+    "faculty_id": 4,
+    "name_kh": "អភិវឌ្ឍន៍សេដ្ឋកិច្ច",
+    "name_en": "Economic Development",
+    "shortcut": "ED"
+  },
+  {
+    "faculty_id": 5,
+    "name_kh": "ភាសាអង់គ្លេសសម្រាប់ទំនាក់ទំនង",
+    "name_en": "English for Communication",
+    "shortcut": "COMM"
+  },
+  {
+    "faculty_id": 1,
+    "name_kh": "ធនាគារ-ហិរញ្ញវត្ថុ",
+    "name_en": "Banking and Finance",
+    "shortcut": "FIN"
+  },
+  {
+    "faculty_id": 4,
+    "name_kh": "ទំនាក់ទំនងអន្តរជាតិ",
+    "name_en": "International Relations",
+    "shortcut": "IR"
+  },
+  {
+    "faculty_id": 4,
+    "name_kh": "នីតិសាធារណៈ",
+    "name_en": "Law",
+    "shortcut": "Law"
+  },
+  {
+    "faculty_id": 1,
+    "name_kh": "គ្រប់គ្រង",
+    "name_en": "Management",
+    "shortcut": "MGT"
+  },
+  {
+    "faculty_id": 1,
+    "name_kh": "ទីផ្សារ",
+    "name_en": "Marketing",
+    "shortcut": "MKT"
+  },
+  {
+    "faculty_id": 4,
+    "name_kh": "រដ្ឋបាលសាធារណៈ",
+    "name_en": "Public Administration",
+    "shortcut": "PA"
+  },
+  {
+    "faculty_id": 5,
+    "name_kh": "អប់រំភាសាអង់គ្លេស",
+    "name_en": "TESOL",
+    "shortcut": "TESOL"
+  },
+  {
+    "faculty_id": 1,
+    "name_kh": "សណ្ឋាគារ ទេសចរណ៍",
+    "name_en": "Tourism",
+    "shortcut": "TOUR"
+  }
 ]

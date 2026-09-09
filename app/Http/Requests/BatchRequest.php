@@ -7,7 +7,7 @@ class BatchRequest extends IRequest
     {
         return array_merge(
             DEFAULT_VALIDATE,
-            check_unique('shortcut', 'batches'),
+            check_unique('batches', 'shortcut', true),
             ['academic_year' => 'nullable|string']
         );
     }

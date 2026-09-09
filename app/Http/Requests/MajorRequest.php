@@ -8,7 +8,7 @@ class MajorRequest extends IRequest
         return array_merge(
             DEFAULT_VALIDATE,
             check_exist('faculty_id', 'faculties'),
-            check_unique('shortcut', 'majors')
+            check_unique('majors', 'shortcut', true)
         );
     }
 }

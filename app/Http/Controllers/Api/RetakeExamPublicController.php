@@ -123,7 +123,7 @@ class RetakeExamPublicController extends Controller
     protected function buildPayload(Student $student): array
     {
         $registrations = RetakeRegistration::query()
-            ->with(['term', 'examType', 'subject', 'lecturer', 'batch'])
+            ->with(['term', 'examType', 'lecturer', 'batch'])
             ->where('student_id', $student->id)
             ->whereNull('registered_at')
             ->get()
@@ -144,7 +144,7 @@ class RetakeExamPublicController extends Controller
             ->values();
 
         $confirmed = RetakeRegistration::query()
-            ->with(['term', 'examType', 'subject', 'lecturer'])
+            ->with(['term', 'examType', 'lecturer'])
             ->where('student_id', $student->id)
             ->whereNotNull('registered_at')
             ->latest('registered_at')

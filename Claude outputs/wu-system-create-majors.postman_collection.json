@@ -1,0 +1,76 @@
+{
+  "info": {
+    "name": "WU System - Create Majors",
+    "description": "Creates the 17 majors you listed via POST /api/v1/majors. The API sits behind the app's normal session-based 'web' auth (bootstrap/app.php puts the api group inside the 'web' middleware group, no Sanctum/token guard), so the two 'Login' requests at the top must run first in the same Postman session to get an authenticated cookie before the Create Major requests will work.\n\nBefore running:\n1. Set 'base_url' below to your app's real URL (default assumes local dev).\n2. Set 'login_email' / 'login_password' to a real user with majors.create permission.\n3. Every Create Major request has \"name_kh\": \"\" (left blank on purpose - I didn't want to guess an official Khmer translation) and \"faculty_id\": 1 (a placeholder - fill in the real faculty for each major, they almost certainly aren't all the same faculty). Shortcuts are my best-guess abbreviations (a few, like CNT/DCA/DIM/TSHS/ENGCOM, are taken from the real shift-code prefixes seen in your URM export; the rest - ARCH, CE, ECD, IR - are inferred since no sample data existed for them) - check them against your existing shortcut",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "login_email", "value": "" },
+    { "key": "login_password", "value": "" },
+    { "key": "csrf_token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Step 1 - Get login page (CSRF cookie + token)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const match = pm.response.text().match(/name=\"_token\"\\s+value=\"([^\"]+)\"/);",
+              "if (match) { pm.collectionVariables.set('csrf_token', match[1]); }",
+              "else { console.warn('Could not find _token on the login page - check the form markup.'); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Step 2 - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "_token", "value": "{{csrf_token}}" },
+            { "key": "email", "value": "{{login_email}}" },
+            { "key": "password", "value": "{{login_password}}" }
+          ]
+        },
+        "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] }
+      }
+    },
+    {
+      "name": "Create Majors",
+      "item": [
+        { "name": "Create Major - Accounting", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Accounting\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"ACC\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Architecture", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Architecture\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"ARCH\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Civil Engineering", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Civil Engineering\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"CE\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Computer Science", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Computer Science\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"CS\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Computer Networking and Technology", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Computer Networking and Technology\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"CNT\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Design and Creative Arts", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Design and Creative Arts\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"DCA\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Digital Innovation Management", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Digital Innovation Management\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"DIM\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Economic Development", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Economic Development\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"ECD\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - English for Communication", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"English for Communication\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"ENGCOM\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Banking and Finance", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Banking and Finance\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"FIN\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - International Relations", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"International Relations\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"IR\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Law", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Law\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"LAW\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Management", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Management\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"MGT\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Marketing", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Marketing\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"MKT\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Public Administration", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Public Administration\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"PA\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - TESOL", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"TESOL\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"TESOL\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } },
+        { "name": "Create Major - Tourism", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"name_en\": \"Tourism\",\n  \"name_kh\": \"\",\n  \"shortcut\": \"TSHS\",\n  \"faculty_id\": 1,\n  \"remark\": \"\"\n}" }, "url": { "raw": "{{base_url}}/api/v1/majors", "host": ["{{base_url}}"], "path": ["api", "v1", "majors"] } } }
+      ]
+    }
+  ]
+}

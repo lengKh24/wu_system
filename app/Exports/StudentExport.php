@@ -13,14 +13,14 @@ class StudentExport extends IExport
 {
     protected string $model = Student::class;
 
-    protected array $relationships = ['person.nationality', 'batch', 'major', 'group', 'shift', 'status'];
+    protected array $relationships = ['person.nationality', 'batch', 'major', 'group', 'shift', 'campus', 'status'];
 
     protected array $headings = [
         'No', 'Code', 'First Name', 'Last Name', 'First Name Kh', 'Last Name Kh',
         'Sex', 'Dob', 'Nationality', 'Email', 'Phone',
-        'Batch', 'Major', 'Group', 'Shift', 'Status',
+        'Batch', 'Major', 'Group', 'Shift', 'Campus', 'Status',
         'Year Level', 'Payment As', 'Admission Date', 'From School',
-        'Degree Type', 'Intake', 'Scholarship', 'Bacc 2 Code',
+        'Degree Type', 'Intake', 'Scholarship', 'Bacc 2 Code', 'Remark',
     ];
 
     public function __construct(protected array $filters = [])
@@ -65,10 +65,11 @@ class StudentExport extends IExport
             $person?->nationality?->name_en,
             $person?->email,
             $phones,
-            $data->batch?->name_en,
+            $data->batch?->shortcut,
             $data->major?->name_en,
             $data->group?->name_en,
             $data->shift?->name_en,
+            $data->campus?->name_en,
             $data->status?->name_en,
             $data->year_level,
             $data->payment_as,
@@ -78,6 +79,7 @@ class StudentExport extends IExport
             $data->intake,
             $data->scholarship,
             $data->bacc_2_code,
+            $data->remark,
         ];
     }
 }

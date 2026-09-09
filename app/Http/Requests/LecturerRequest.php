@@ -7,7 +7,7 @@ class LecturerRequest extends IRequest
     {
         return array_merge(
             DEFAULT_VALIDATE,
-            check_unique('shortcut', 'lecturers')
+            check_unique('lecturers', 'shortcut', true)
         );
     }
 }

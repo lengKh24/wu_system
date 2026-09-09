@@ -55,6 +55,9 @@ export function buildDom() {
         importFileInput: document.getElementById('retakeImportFile'),
         importFileName: document.getElementById('retakeImportFileName'),
         importClearBtn: document.getElementById('retakeImportClearBtn'),
+        importSubmitBtn: document.getElementById('retakeImportSubmitBtn'),
+        importSpinner: document.getElementById('retakeImportSpinner'),
+        importSubmitLabel: document.getElementById('retakeImportSubmitLabel'),
 
         // Import results modal
         importResultsModal: document.getElementById('retakeImportResultsModal'),

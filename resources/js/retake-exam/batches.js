@@ -195,8 +195,22 @@ export function clearImportFile(dom) {
     dom.importClearBtn?.classList.add('hidden');
 }
 
+function setImportSubmitting(dom, isSubmitting) {
+    if (dom.importSubmitBtn) dom.importSubmitBtn.disabled = isSubmitting;
+    dom.importSpinner?.classList.toggle('hidden', !isSubmitting);
+    if (dom.importSubmitLabel) {
+        dom.importSubmitLabel.textContent = isSubmitting
+            ? 'កំពុងនាំចូល... (Importing...)'
+            : 'នាំចូល (Import)';
+    }
+}
+
 /** Submits the "Import 1st Supplementary" form. */
 export async function submitImportForm(dom, ApiService, onDone) {
+    // Guard against a spam-click firing the same import twice while the
+    // first request is still in flight.
+    if (dom.importSubmitBtn?.disabled) return;
+
     const termId = dom.importTermSelect?.value;
     const file = dom.importFileInput?.files[0];
 
@@ -213,24 +227,30 @@ export async function submitImportForm(dom, ApiService, onDone) {
     body.append('retake_term_id', termId);
     body.append('file', file);
 
-    const { error, data } = await ApiService.request(`${CONFIG.BATCHES_API}/import`, {
-        method: 'POST',
-        body,
-    });
+    setImportSubmitting(dom, true);
 
-    if (error) {
-        Toast.fire({ icon: 'error', title: data?.message || 'ការនាំចូលបរាជ័យ (Import failed)' });
-        return;
+    try {
+        const { error, data } = await ApiService.request(`${CONFIG.BATCHES_API}/import`, {
+            method: 'POST',
+            body,
+        });
+
+        if (error) {
+            Toast.fire({ icon: 'error', title: data?.message || 'ការនាំចូលបរាជ័យ (Import failed)' });
+            return;
+        }
+
+        window.RetakeImportModal.toggle(false);
+        clearImportFile(dom);
+
+        const report = data?.data?.report ?? {};
+        Toast.fire({ icon: 'success', title: `នាំចូលជោគជ័យ! (${report.created_count ?? 0} row(s) created)` });
+
+        renderImportResults(dom, report);
+        onDone();
+    } finally {
+        setImportSubmitting(dom, false);
     }
-
-    window.RetakeImportModal.toggle(false);
-    clearImportFile(dom);
-
-    const report = data?.data?.report ?? {};
-    Toast.fire({ icon: 'success', title: `នាំចូលជោគជ័យ! (${report.created_count ?? 0} row(s) created)` });
-
-    renderImportResults(dom, report);
-    onDone();
 }
 
 /**
@@ -257,13 +277,6 @@ function renderImportResults(dom, report) {
             report.skipped_student,
             ['Row', 'Student Code', 'Reason'],
             (r) => [r.row, r.student_code, r.reason]
-        ),
-        importIssueTable(
-            'មុខវិជ្ជាមិនត្រូវគ្នា (Subject not matched)',
-            'rose',
-            report.skipped_subject,
-            ['Row', 'Student Code', 'Major', 'Subject', 'Reason'],
-            (r) => [r.row, r.student_code, r.major, r.subject, r.reason]
         ),
         importIssueTable(
             'សាស្ត្រាចារ្យមិនត្រូវគ្នា — បានបង្កើតដោយគ្មានឈ្មោះ (Lecturer not matched — row still created)',

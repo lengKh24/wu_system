@@ -1,58 +1,62 @@
 [
-    {
-        "shortcut": "student",
-        "name_kh": "កំពុងសិក្សា",
-        "name_en": "Active"
-    },
-    {
-        "shortcut": "student",
-        "name_kh": "ព្យួរការសិក្សា",
-        "name_en": "Deferred"
-    },
-    {
-        "shortcut": "student",
-        "name_kh": "បោះបង់ការសិក្សា (ជូនដំណឹង)",
-        "name_en": "Dropout"
-    },
-    {
-        "id": 4,
-        "shortcut": "student",
-        "name_kh": "បោះបង់ការសិក្សា (មិនជូនដំណឹង)",
-        "name_en": "Quit"
-    },
-    {
-        "shortcut": "student",
-        "name_kh": "ឈប់ហើយសុំចូលរៀនវិញ",
-        "name_en": "Re-enrolled"
-    },
-    {
-        "shortcut": "student",
-        "name_kh": "សិស្សបន្តផ្ទេររៀនថែមមុខវិជ្ជា",
-        "name_en": "Add Subject"
-    },
-    {
-        "shortcut": "student",
-        "name_kh": "សិស្សរៀនសង",
-        "name_en": "Retake Subject"
-    },
-    {
-        "shortcut": "student",
-        "name_kh": "សិស្សបញ្ចប់បរិញ្ញាបត្រ/បរិញ្ញាបត្ររង",
-        "name_en": "Graduated"
-    },
-    {
-        "shortcut": "student",
-        "name_kh": "សិស្សផ្ទេរចូល",
-        "name_en": "Transferred"
-    },
-    {
-        "shortcut": "student",
-        "name_kh": "សិស្សផ្ទេរទៅសាខា",
-        "name_en": "Campus Move Out"
-    },
-    {
-        "shortcut": "student",
-        "name_kh": "សិស្សផ្ទេរចូលសាខា",
-        "name_en": "Campus Move In"
-    }
+  {
+    "shortcut": "active",
+    "name_kh": "កំពុងសិក្សា",
+    "name_en": "Active"
+  },
+  {
+    "shortcut": "deferred",
+    "name_kh": "ព្យួរការសិក្សា",
+    "name_en": "Deferred"
+  },
+  {
+    "shortcut": "dropout",
+    "name_kh": "បោះបង់ការសិក្សា (ជូនដំណឹង)",
+    "name_en": "Dropout"
+  },
+  {
+    "shortcut": "quit",
+    "name_kh": "បោះបង់ការសិក្សា (មិនជូនដំណឹង)",
+    "name_en": "Quit"
+  },
+  {
+    "shortcut": "re_enrolled",
+    "name_kh": "ឈប់ហើយសុំចូលរៀនវិញ",
+    "name_en": "Re-enrolled"
+  },
+  {
+    "shortcut": "add_subject",
+    "name_kh": "សិស្សបន្តរផ្ទេររៀនថែមមុខវិជ្ជា",
+    "name_en": "Add Subject"
+  },
+  {
+    "shortcut": "retake_subject",
+    "name_kh": "សិស្សរៀនសង",
+    "name_en": "Retake Subject"
+  },
+  {
+    "shortcut": "graduated",
+    "name_kh": "សិស្សបញ្ចប់ បរិញ្ញាបត្រ/រង",
+    "name_en": "Graduated"
+  },
+  {
+    "shortcut": "transferred",
+    "name_kh": "សិស្សផ្ទេរចូល",
+    "name_en": "Transferred"
+  },
+  {
+    "shortcut": "campus_move_out",
+    "name_kh": "សិស្សផ្ទេរទៅសាខា",
+    "name_en": "Campus Move Out"
+  },
+  {
+    "shortcut": "campus_move_in",
+    "name_kh": "សិស្សផ្ទេរចូលសាខា",
+    "name_en": "Campus Move In"
+  },
+  {
+    "shortcut": "other",
+    "name_kh": "ផ្សេងៗ",
+    "name_en": "Other"
+  }
 ]

@@ -14,7 +14,7 @@ class DeletionLog extends IModel
 
     protected $fillable = [
         'original_registration_id', 'previous_registration_id',
-        'student_id', 'subject_id', 'retake_term_id', 'exam_type_id',
+        'student_id', 'subject', 'retake_term_id', 'exam_type_id',
         'reason', 'deleted_at_source', 'remark',
     ];
 
@@ -25,11 +25,6 @@ class DeletionLog extends IModel
     public function student()
     {
         return $this->belongsTo(Student::class);
-    }
-
-    public function subject()
-    {
-        return $this->belongsTo(Subject::class);
     }
 
     public function term()
@@ -57,7 +52,7 @@ class DeletionLog extends IModel
                 'original_registration_id' => $registration->id,
                 'previous_registration_id' => $registration->previous_registration_id,
                 'student_id'               => $registration->student_id,
-                'subject_id'               => $registration->subject_id,
+                'subject'                  => $registration->subject,
                 'retake_term_id'           => $registration->retake_term_id,
                 'exam_type_id'             => $registration->exam_type_id,
                 'reason'                   => $reason,

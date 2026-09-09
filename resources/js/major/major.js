@@ -15,8 +15,51 @@
 
     // GLOBAL APP STATE CONTAINER
     const STATE = {
-        faculties: [] // Holds local cached reference copy for cross-referencing tables
+        faculties: [], // Holds local cached reference copy for cross-referencing tables
+        currentPage: 1
     };
+
+    // Pagination rendering (mirrors resources/js/student/student-pagination.js's
+    // handling of Laravel's standard paginated-resource `meta` shape).
+    function renderPagination(meta) {
+        const el = document.getElementById('pagination-container');
+        if (!el) return;
+
+        if (!meta || !meta.total) {
+            el.innerHTML = '';
+            return;
+        }
+
+        const { current_page: current, last_page: last, total, from, to } = meta;
+
+        el.innerHTML = `
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                    កំពុងបង្ហាញ ${from ?? 0}–${to ?? 0} នៃ ${total} (Showing ${from ?? 0}-${to ?? 0} of ${total})
+                </p>
+                <div class="flex items-center gap-1.5">
+                    <button type="button" data-page="${current - 1}" ${current <= 1 ? 'disabled' : ''}
+                        class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                        មុន (Prev)
+                    </button>
+                    <span class="px-2 text-xs font-medium text-neutral-500 dark:text-neutral-400">ទំព័រ ${current} / ${last}</span>
+                    <button type="button" data-page="${current + 1}" ${current >= last ? 'disabled' : ''}
+                        class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                        បន្ទាប់ (Next)
+                    </button>
+                </div>
+            </div>`;
+    }
+
+    function bindPagination(onPageChange) {
+        document.getElementById('pagination-container')?.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-page]');
+            if (!btn || btn.disabled) return;
+
+            const page = Number(btn.dataset.page);
+            if (page >= 1) onPageChange(page);
+        });
+    }
 
     // Dynamic Dropdown
     async function loadFacultiesDropdown() {
@@ -110,8 +153,9 @@
     };
 
     // 5. CORE WORKFLOW CONTROLLERS
-    async function loadmajors(searchQuery = '') {
-        const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}`;
+    async function loadmajors(searchQuery = '', page = 1) {
+        STATE.currentPage = page;
+        const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}&page=${page}`;
         const { error, data } = await ApiService.request(url);
 
         if (error) {
@@ -122,6 +166,7 @@
         // Handle both object-paginated dynamic data lists or straight array responses safely
         const records = data && Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
         renderTable(records);
+        renderPagination(data?.meta);
     }
 
     //Edit
@@ -167,7 +212,7 @@
         const { error } = await ApiService.request(`${CONFIG.API_BASE}/${id}`, { method: 'DELETE' });
         if (!error) {
             Toast.fire({ icon: 'success', title: 'លុបទិន្នន័យបានជោគជ័យ!' });
-            loadmajors(DOM.searchInput?.value || '');
+            loadmajors(DOM.searchInput?.value || '', STATE.currentPage);
         } else {
             Toast.fire({ icon: 'error', title: 'មានបញ្ហាមិនអាចលុបទិន្នន័យនេះបាន' });
         }
@@ -205,7 +250,7 @@
             });
             resetFormState();
             toggleModal(false);
-            loadmajors();
+            loadmajors(DOM.searchInput?.value || '', STATE.currentPage);
         } else if (status === 422 && data) {
             const errorMessages = data.errors ? Object.values(data.errors).flat() : ['Validation failed'];
             Toast.fire({
@@ -350,9 +395,11 @@
         DOM.searchInput?.addEventListener('input', (e) => {
             clearTimeout(state.debounceTimer);
             state.debounceTimer = setTimeout(() => {
-                loadmajors(e.target.value);
+                loadmajors(e.target.value, 1);
             }, CONFIG.DEBOUNCE_DELAY);
         });
+
+        bindPagination((page) => loadmajors(DOM.searchInput?.value || '', page));
 
         // Form Submit
         DOM.form?.addEventListener('submit', handleFormSubmit);

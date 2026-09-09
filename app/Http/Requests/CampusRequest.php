@@ -7,7 +7,7 @@ class CampusRequest extends IRequest
     {
         return array_merge(
             DEFAULT_VALIDATE,
-            check_unique('shortcut', 'campuses')
+            check_unique('campuses', 'shortcut', true)
         );
     }
 }

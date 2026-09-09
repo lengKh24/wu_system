@@ -8,7 +8,7 @@ class SubjectRequest extends IRequest
         return array_merge(
             DEFAULT_VALIDATE,
             check_exist('major_id', 'majors'),
-            check_unique('code', 'subjects'),
+            check_unique('subjects', 'code', true),
             [
                 'year_level' => 'nullable|string|max:50',
                 'semester'   => 'nullable|string|max:50',

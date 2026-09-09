@@ -28,6 +28,7 @@ class StudentResource extends IResource
             'batch'          => new BatchResource($this->whenLoaded('batch')),
             'group'          => new GroupResource($this->whenLoaded('group')),
             'shift'          => new ShiftResource($this->whenLoaded('shift')),
+            'campus'         => new CampusResource($this->whenLoaded('campus')),
             'major'          => new MajorResource($this->whenLoaded('major')),
             'person'         => new PersonResource($this->whenLoaded('person')),
             'guardians'      => GuardianResource::collection($this->whenLoaded('guardians')),

@@ -14,7 +14,7 @@ class RetakeRegistrationExport extends IExport
 {
     protected string $model = RetakeRegistration::class;
 
-    protected array $relationships = ['student.person', 'term', 'examType', 'subject', 'lecturer', 'score'];
+    protected array $relationships = ['student.person', 'term', 'examType', 'lecturer', 'score'];
 
     protected array $headings = [
         'No', 'Student Code', 'Full Name', 'Term', 'Exam Type', 'Subject', 'Lecturer',
@@ -60,7 +60,7 @@ class RetakeRegistrationExport extends IExport
             trim(($person?->first_name ?? '') . ' ' . ($person?->last_name ?? '')),
             $data->term?->title,
             $data->examType?->name_en,
-            $data->subject?->name_en,
+            $data->subject,
             $data->lecturer?->name_en,
             $data->registered_at?->format('Y-m-d H:i:s'),
             $data->payment_status,

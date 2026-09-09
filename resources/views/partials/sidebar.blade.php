@@ -66,8 +66,27 @@
                     </button>
                 </div>
 
+                <div class="relative mb-3">
+                    <svg class="absolute w-4 h-4 -translate-y-1/2 pointer-events-none left-3 top-1/2 text-neutral-400"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                    <input type="text" id="sidebarSearchInput" placeholder="ស្វែងរកម៉ឺនុយ... (Search menu)"
+                        autocomplete="off"
+                        class="w-full py-2 pl-9 pr-8 text-sm rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/5 text-neutral-700 dark:text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="button" id="sidebarSearchClear"
+                        class="absolute hidden -translate-y-1/2 right-2 top-1/2 p-1 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-200 dark:hover:bg-white/10">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
                 <div class="flex-1 pr-1 overflow-y-auto custom-scrollbar">
-                    <ul class="space-y-2 font-medium">
+                    <ul id="sidebarNavList" class="space-y-2 font-medium">
+                        <li id="sidebarNoResults" class="hidden px-3 py-6 text-xs text-center text-neutral-400">
+                            រកមិនឃើញម៉ឺនុយត្រូវគ្នា (No matching menu items)
+                        </li>
                         <x-sidebar-link route="dashboard">
                             <x-slot name="icon">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -80,7 +99,7 @@
                         </x-sidebar-link>
 
                         @can('alert.view')
-                        <li class="pt-4 pb-1">
+                        <li class="pt-4 pb-1" data-sidebar-section>
                             <span
                                 class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Notification</span>
                         </li>
@@ -97,12 +116,12 @@
                         @endcan
 
                         @can('state-exam.view')
-                            <li class="pt-4 pb-1">
+                            <li class="pt-4 pb-1" data-sidebar-section>
 
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Exam</span>
                             </li>
-                            <li x-data="{ open: {{ request()->routeIs('state-exam.*') ? 'true' : 'false' }} }">
+                            <li data-sidebar-group x-data="{ open: {{ request()->routeIs('state-exam.*') ? 'true' : 'false' }} }">
                                 <button type="button" @click="open = !open"
                                     class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl transition-all duration-200 group
                                     {{ request()->routeIs('state-exam.*')
@@ -202,7 +221,7 @@
                         @endcan
 
                         @can('retake-score.edit')
-                            <li class="pt-4 pb-1">
+                            <li class="pt-4 pb-1" data-sidebar-section>
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Scoring</span>
                             </li>
@@ -219,7 +238,7 @@
                         @endcan
 
                         @can('retake-payment.edit')
-                            <li class="pt-4 pb-1">
+                            <li class="pt-4 pb-1" data-sidebar-section>
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Payment</span>
                             </li>
@@ -236,7 +255,7 @@
                         @endcan
 
                         @can('payment-entry.view')
-                            <li class="pt-4 pb-1">
+                            <li class="pt-4 pb-1" data-sidebar-section>
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Accounting</span>
                             </li>
@@ -253,7 +272,7 @@
                         @endcan
 
                         @can('retake-cs.view')
-                            <li class="pt-4 pb-1">
+                            <li class="pt-4 pb-1" data-sidebar-section>
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Customer Service</span>
                             </li>
@@ -270,7 +289,7 @@
                         @endcan
 
                         @can('certificate.view')
-                            <li class="pt-4 pb-1">
+                            <li class="pt-4 pb-1" data-sidebar-section>
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Certificate</span>
 
@@ -290,7 +309,7 @@
                         @endcan
 
                         @can('student.view')
-                            <li class="pt-4 pb-1">
+                            <li class="pt-4 pb-1" data-sidebar-section>
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Statistic</span>
                             </li>
@@ -311,11 +330,11 @@
                         @endphp
                         @canany(['faculty.view', 'major.view', 'batch.view', 'shift.view', 'group.view',
                             'app-status.view', 'campus.view'])
-                            <li class="pt-4 pb-1">
+                            <li class="pt-4 pb-1" data-sidebar-section>
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Academics</span>
                             </li>
-                            <li x-data="{ open: {{ request()->routeIs($academicRoutes) ? 'true' : 'false' }} }">
+                            <li data-sidebar-group x-data="{ open: {{ request()->routeIs($academicRoutes) ? 'true' : 'false' }} }">
                                 <button type="button" @click="open = !open"
                                     class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl transition-all duration-200 group
                                     {{ request()->routeIs($academicRoutes)
@@ -453,11 +472,11 @@
                             $administrationRoutes = ['role.*', 'activity.*', 'register'];
                         @endphp
                         @can('role.view')
-                            <li class="pt-4 pb-1">
+                            <li class="pt-4 pb-1" data-sidebar-section>
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Administration</span>
                             </li>
-                            <li x-data="{ open: {{ request()->routeIs($administrationRoutes) ? 'true' : 'false' }} }">
+                            <li data-sidebar-group x-data="{ open: {{ request()->routeIs($administrationRoutes) ? 'true' : 'false' }} }">
                                 <button type="button" @click="open = !open"
                                     class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl transition-all duration-200 group
                                     {{ request()->routeIs($administrationRoutes)

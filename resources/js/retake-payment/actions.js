@@ -23,7 +23,7 @@ export function openPayModal(dom, ids) {
     state.payingStudentId = rows[0].student?.id ?? null;
 
     const studentName = escapeHtml(rows[0].student?.name || rows[0].student?.code || '—');
-    const subjectList = rows.map((r) => escapeHtml(r.subject?.name || r.subject?.code || '—')).join(', ');
+    const subjectList = rows.map((r) => escapeHtml(r.subject || '—')).join(', ');
 
     if (dom.payContext) {
         dom.payContext.innerHTML = `<strong>${studentName}</strong><br><span class="text-xs text-neutral-500 dark:text-neutral-400">${rows.length} subject(s): ${subjectList}</span>`;

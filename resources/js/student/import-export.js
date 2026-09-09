@@ -27,6 +27,9 @@ function buildImportDom() {
         importFileInput: getById('studentImportFile'),
         importFileName: getById('studentImportFileName'),
         importClearBtn: getById('studentImportClearBtn'),
+        importSubmitBtn: getById('studentImportSubmitBtn'),
+        importSpinner: getById('studentImportSpinner'),
+        importSubmitLabel: getById('studentImportSubmitLabel'),
 
         resultsModal: getById('studentImportResultsModal'),
         resultsBody: getById('studentImportResultsBody'),
@@ -66,6 +69,16 @@ function setImportFile(dom, file) {
 
     if (dom.importFileName) dom.importFileName.textContent = file.name;
     dom.importClearBtn?.classList.remove('hidden');
+}
+
+function setImportSubmitting(dom, isSubmitting) {
+    if (dom.importSubmitBtn) dom.importSubmitBtn.disabled = isSubmitting;
+    dom.importSpinner?.classList.toggle('hidden', !isSubmitting);
+    if (dom.importSubmitLabel) {
+        dom.importSubmitLabel.textContent = isSubmitting
+            ? 'កំពុងនាំចូល... (Importing...)'
+            : 'នាំចូល (Import)';
+    }
 }
 
 function clearImportFile(dom) {
@@ -170,6 +183,11 @@ export function initStudentImportExport(ApiService, reloadList) {
     dom.importForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // Guards against double-submit from a spam click — the request can
+        // take a while for a large spreadsheet, and the button is otherwise
+        // free to be clicked again while the first import is still in flight.
+        if (dom.importSubmitBtn?.disabled) return;
+
         const file = dom.importFileInput?.files?.[0];
         if (!file) {
             Toast.fire({ icon: 'warning', title: 'សូមជ្រើសរើសឯកសារ (Please choose a file)' });
@@ -179,20 +197,25 @@ export function initStudentImportExport(ApiService, reloadList) {
         const body = new FormData();
         body.append('file', file);
 
-        const { error, data } = await ApiService.request(IMPORT_URL, { method: 'POST', body });
+        setImportSubmitting(dom, true);
+        try {
+            const { error, data } = await ApiService.request(IMPORT_URL, { method: 'POST', body });
 
-        if (error) {
-            const firstError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
-            Toast.fire({ icon: 'error', title: firstError || data?.message || 'ការនាំចូលបរាជ័យ (Import failed)' });
-            return;
+            if (error) {
+                const firstError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
+                Toast.fire({ icon: 'error', title: firstError || data?.message || 'ការនាំចូលបរាជ័យ (Import failed)' });
+                return;
+            }
+
+            window.StudentImportModal.toggle(false);
+            clearImportFile(dom);
+
+            const report = data?.data?.report ?? {};
+            Toast.fire({ icon: 'success', title: `នាំចូលជោគជ័យ! (${report.created_count ?? 0} row(s) created)` });
+            renderImportResults(dom, report);
+            reloadList();
+        } finally {
+            setImportSubmitting(dom, false);
         }
-
-        window.StudentImportModal.toggle(false);
-        clearImportFile(dom);
-
-        const report = data?.data?.report ?? {};
-        Toast.fire({ icon: 'success', title: `នាំចូលជោគជ័យ! (${report.created_count ?? 0} row(s) created)` });
-        renderImportResults(dom, report);
-        reloadList();
     });
 }
