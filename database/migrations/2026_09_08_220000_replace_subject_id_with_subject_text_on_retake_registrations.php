@@ -17,8 +17,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('retake_registrations', function (Blueprint $table) {
-            $table->dropUnique('uq_reg_batch_student_subject');
+            // dropForeign() MUST run before dropUnique()/dropIndex() — MySQL
+            // refuses to drop an index a foreign key still depends on
+            // (SQLite doesn't enforce this, which is why this passed a local
+            // sqlite dry-run but failed on production's MySQL).
             $table->dropForeign(['subject_id']);
+            $table->dropUnique('uq_reg_batch_student_subject');
             $table->dropIndex(['student_id', 'subject_id']);
             $table->dropColumn('subject_id');
 

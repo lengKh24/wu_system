@@ -16,8 +16,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('deletion_log', function (Blueprint $table) {
-            $table->dropIndex(['student_id', 'subject_id']);
+            // dropForeign() MUST run before dropIndex() — see the matching
+            // note in 2026_09_08_220000_..._on_retake_registrations.php.
             $table->dropForeign(['subject_id']);
+            $table->dropIndex(['student_id', 'subject_id']);
             $table->dropColumn('subject_id');
 
             $table->string('subject')->after('student_id');
