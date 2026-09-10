@@ -30,15 +30,18 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
  * messy multi-value class-code list, not a real shift, and is dropped
  * entirely (decision #10) — never read here.
  *
- * Subject is matched by Major + Subject name together, not name alone —
- * the real export has the same subject name (e.g. "Macroeconomics")
- * appearing under more than one major. Matching is case-insensitive and
- * trimmed since the sheet's casing is inconsistent even for the same
- * subject across rows (e.g. "Digital drawing media" vs "Digital Drawing
- * Media"). Lecturer is matched by name alone and is allowed to miss — a
- * typo'd or unrecognized lecturer name never blocks the student's
- * registration; the row is still created with lecturer_id null and
- * surfaced in the report for REG to fix by hand.
+ * Subject is matched by name alone (case-insensitive, trimmed) — Subject
+ * stopped being major-scoped once the standalone Subject module (2026-09)
+ * reworked `subjects` into a shared catalog keyed by Faculty (faculty_id/
+ * level/lecturer_hour) instead of major_id/year_level/semester, so the
+ * same subject name is now expected to resolve to one shared row
+ * regardless of which major's sheet it came from. The sheet's "Major"
+ * column is read only to resolve a Faculty (via Major::faculty_id) for
+ * fabricating a placeholder subject in local testing — it is never
+ * required to find an already-existing subject. Lecturer is matched by
+ * name alone and is allowed to miss — a typo'd or unrecognized lecturer
+ * name never blocks the student's registration; the row is still created
+ * with lecturer_id null and surfaced in the report for REG to fix by hand.
  */
 class RetakeRegistrationImport implements ToCollection, WithHeadingRow
 {
@@ -109,35 +112,24 @@ class RetakeRegistrationImport implements ToCollection, WithHeadingRow
             $student = $this->createPlaceholderStudent($code, $majorId);
         }
 
-        $subjectId = $majorId ? $this->resolveSubjectId($majorId, $subjectName) : null;
-
-        // --- Original strict match, commented out for local testing (2026-09-07) ---
-        // Restore this block (and delete the placeholder block below) before
-        // importing against production, where a real subject match is
-        // required. Major still must match either way — only Subject skips.
-        // if (! $subjectId) {
-        //     $this->skippedSubject[] = [
-        //         'row' => $rowNumber, 'student_code' => $code,
-        //         'major' => $majorName, 'subject' => $subjectName,
-        //         'reason' => $majorId ? 'No subject matched that name under that major.' : 'Major not found.',
-        //     ];
-        //     return;
-        // }
+        $subjectId = $this->resolveSubjectId($subjectName);
 
         if (! $subjectId) {
-            if (! $majorId || ! app()->environment('local')) {
+            if (! app()->environment('local')) {
                 $this->skippedSubject[] = [
                     'row' => $rowNumber, 'student_code' => $code,
                     'major' => $majorName, 'subject' => $subjectName,
-                    'reason' => $majorId ? 'No subject matched that name under that major.' : 'Major not found.',
+                    'reason' => 'No subject matched that name.',
                 ];
                 return;
             }
 
-            // Local-only: fabricate a subject under the (real, matched)
-            // major so the import flow can be tested without pre-loading
-            // every subject the real file references.
-            $subjectId = $this->createPlaceholderSubject($majorId, $subjectName);
+            // Local-only: fabricate a subject (under the matched major's
+            // faculty, when known) so the import flow can be tested without
+            // pre-loading every subject the real file references.
+            $facultyId = ($majorId ? Major::query()->whereKey($majorId)->value('faculty_id') : null)
+                ?? \App\Models\Faculty::query()->value('id');
+            $subjectId = $this->createPlaceholderSubject($facultyId, $subjectName);
         }
 
         $lecturerId = $this->lecturerIndex[$this->key($lecturerName)] ?? null;
@@ -202,35 +194,33 @@ class RetakeRegistrationImport implements ToCollection, WithHeadingRow
 
     /**
      * Local-testing-only helper — see the "local-only" branch in
-     * processRow(). Fabricates a Subject under a real, already-matched
-     * major so the import flow doesn't require every subject to be
-     * pre-loaded locally. Keyed on (major_id, name_en) so the same subject
-     * name repeated across rows/re-imports reuses one row instead of
+     * processRow(). Fabricates a Subject (under the matched major's
+     * faculty, when resolvable) so the import flow doesn't require every
+     * subject to be pre-loaded locally. Keyed on name_en alone — Subject is
+     * a shared catalog now, not major-scoped — so the same subject name
+     * repeated across rows/re-imports reuses one row instead of
      * duplicating, and feeds subjectCache so resolveSubjectId() finds it
      * on any later row in this same run.
      */
-    protected function createPlaceholderSubject(int $majorId, string $subjectName): int
+    protected function createPlaceholderSubject(?int $facultyId, string $subjectName): int
     {
         $subject = Subject::query()->updateOrCreate(
-            ['major_id' => $majorId, 'name_en' => $subjectName],
-            ['name_kh' => $subjectName]
+            ['name_en' => $subjectName],
+            ['name_kh' => $subjectName, 'faculty_id' => $facultyId, 'level' => 'bachelor']
         );
 
-        $cacheKey = $majorId . '|' . $this->key($subjectName);
-
-        return $this->subjectCache[$cacheKey] = $subject->id;
+        return $this->subjectCache[$this->key($subjectName)] = $subject->id;
     }
 
-    protected function resolveSubjectId(int $majorId, string $subjectName): ?int
+    protected function resolveSubjectId(string $subjectName): ?int
     {
-        $cacheKey = $majorId . '|' . $this->key($subjectName);
+        $cacheKey = $this->key($subjectName);
 
         if (array_key_exists($cacheKey, $this->subjectCache)) {
             return $this->subjectCache[$cacheKey];
         }
 
         $subject = Subject::query()
-            ->where('major_id', $majorId)
             ->whereRaw('LOWER(TRIM(name_en)) = ?', [mb_strtolower($subjectName)])
             ->first();
 

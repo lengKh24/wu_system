@@ -208,6 +208,9 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:lecturer.create')
         ->post('/lecturers-import', [LecturerController::class, 'importFile'])
         ->name('lecturers.import');
+    Route::middleware('permission:lecturer.delete')
+        ->delete('/lecturers-bulk-destroy', [LecturerController::class, 'bulkDestroy'])
+        ->name('lecturers.bulk-destroy');
 
     // Register API resource routes for various controllers
     api_routes([
