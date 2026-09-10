@@ -7,6 +7,7 @@ import { handlePreviewAction } from './preview.js';
 import { loadStudents, handleEditAction, handleDeleteAction, handleFormSubmit } from './student-form.js';
 import { bindPagination } from './student-pagination.js';
 import { initStudentImportExport } from './import-export.js';
+import { initStudentBulkDestroy } from './bulk-destroy.js';
 
 /**
  * THE single DOMContentLoaded listener for this page.
@@ -39,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindPagination((page) => loadStudents(dom, ApiService, dom.searchInput?.value || '', page));
     initEvents(dom, ApiService);
     initStudentImportExport(ApiService, () => loadStudents(dom, ApiService, dom.searchInput?.value || ''));
+    initStudentBulkDestroy(ApiService, () => loadStudents(dom, ApiService, dom.searchInput?.value || ''));
     loadStudents(dom, ApiService);
 });
 
