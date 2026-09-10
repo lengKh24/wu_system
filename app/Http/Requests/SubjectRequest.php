@@ -7,12 +7,12 @@ class SubjectRequest extends IRequest
     {
         return array_merge(
             DEFAULT_VALIDATE,
-            check_exist('major_id', 'majors'),
+            check_exist('faculty_id', 'faculties'),
             check_unique('subjects', 'code', true),
             [
-                'year_level' => 'nullable|string|max:50',
-                'semester'   => 'nullable|string|max:50',
-                'credit'     => 'nullable|integer',
+                'level'         => 'required|in:associate,bachelor,master,phd,Doctor/PhD',
+                'lecturer_hour' => 'nullable|integer|min:0',
+                'credit'        => 'nullable|integer',
             ]
         );
     }

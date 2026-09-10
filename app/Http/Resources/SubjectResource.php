@@ -10,12 +10,18 @@ class SubjectResource extends IResource
      */
     public function toList(): array
     {
+        $level = $this->level;
+
         return to_list($this, [
-            'code'       => $this->code,
-            'major'      => new MajorResource($this->whenLoaded('major')),
-            'year_level' => $this->year_level,
-            'semester'   => $this->semester,
-            'credit'     => $this->credit,
+            'code'          => $this->code,
+            'faculty'       => new FacultyResource($this->whenLoaded('faculty')),
+            'level'         => $level?->value ?? $level,
+            'level_label'   => [
+                'en' => $level?->labelEn(),
+                'kh' => $level?->labelKh(),
+            ],
+            'lecturer_hour' => $this->lecturer_hour,
+            'credit'        => $this->credit,
         ]);
     }
 }

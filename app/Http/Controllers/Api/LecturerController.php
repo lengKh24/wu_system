@@ -1,11 +1,14 @@
 <?php
 namespace App\Http\Controllers\Api;
 
+use App\Exports\LecturerExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LecturerRequest;
 use App\Http\Resources\LecturerResource;
+use App\Imports\LecturerImport;
 use App\Models\Lecturer;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LecturerController extends Controller
 {
@@ -22,6 +25,36 @@ class LecturerController extends Controller
     public function index(Request $request)
     {
         return $this->list($request);
+    }
+
+    public function exportList(Request $request)
+    {
+        return $this->export(
+            new LecturerExport($request->only(['search'])),
+            'lecturers'
+        );
+    }
+
+    /**
+     * Bulk lecturer import — see LecturerImport's docblock for the exact
+     * column contract and what gets skipped vs created.
+     */
+    public function importFile(Request $request)
+    {
+        $validated = $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new LecturerImport();
+
+        try {
+            Excel::import($import, $validated['file']);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Lecturer import failed', ['error' => $e->getMessage()]);
+            return no_data('The file could not be processed. Please check it is a valid, correctly formatted spreadsheet.', 422);
+        }
+
+        return has_data(['report' => $import->report()], 'Import complete.');
     }
 
     /**

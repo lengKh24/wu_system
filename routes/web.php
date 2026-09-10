@@ -21,6 +21,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\StudentStatusController;
 use App\Http\Controllers\StateExamController;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('shift', ShiftController::class)->only('index')->middleware('can:shift.view');
     Route::resource('faculty', FacultyController::class)->only('index')->middleware('can:faculty.view');
     Route::resource('major', MajorController::class)->only('index')->middleware('can:major.view');
+    Route::resource('subject', SubjectController::class)->only('index')->middleware('can:subject.view');
     Route::resource('batch', BatchController::class)->only('index')->middleware('can:batch.view');
     Route::resource('group', GroupController::class)->only('index')->middleware('can:group.view');
     Route::resource('campus', CampusController::class)->only('index')->middleware('can:campus.view');

@@ -1,12 +1,12 @@
 [
   {
     "name_kh": "មហាវិទ្យាល័យ គ្រប់គ្រង និងសណ្ឋាគារ-ទេសចរណ៍",
-    "name_en": "Faculty of Management, Hospitality and Tourism",
+    "name_en": "Faculty of Management and Hotel​-​​Tourism",
     "shortcut": "FMHT"
   },
   {
     "name_kh": "មហាវិទ្យាល័យ ស្ថាបត្យកម្មវិស្វកម្ម វិស្វកម្ម និងសំណង់",
-    "name_en": "Faculty of Architecture, Engineering and Construction",
+    "name_en": "Faculty of Architecture Engineering and Construction",
     "shortcut": "FAEC"
   },
   {
@@ -23,5 +23,10 @@
     "name_kh": "មហាវិទ្យាល័យ សិល្បៈ មនុស្សសាស្ត្រ និងភាសា",
     "name_en": "Faculty of Arts, Humanities and Languages",
     "shortcut": "FAHL"
+  },
+  {
+    "name_kh": "មហាវិទ្យាល័យ ក្រោយបរិញ្ញាបត្រ",
+    "name_en": "Graduate School",
+    "shortcut": "GS"
   }
 ]

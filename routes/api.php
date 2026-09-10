@@ -186,6 +186,29 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->delete('/students-bulk-destroy', [StudentController::class, 'bulkDestroy'])
         ->name('students.bulk-destroy');
 
+    // Flat sibling routes for subjects — same reasoning as students above:
+    // registered before api_routes()'s /subjects/{subject} wildcard so
+    // "export"/"import" are never swallowed as an id.
+    Route::middleware('permission:subject.view')
+        ->get('/subjects-export', [SubjectController::class, 'exportList'])
+        ->name('subjects.export');
+    Route::middleware('permission:subject.create')
+        ->post('/subjects-import', [SubjectController::class, 'importFile'])
+        ->name('subjects.import');
+    Route::middleware('permission:subject.delete')
+        ->delete('/subjects-bulk-destroy', [SubjectController::class, 'bulkDestroy'])
+        ->name('subjects.bulk-destroy');
+
+    // Flat sibling routes for lecturers — same reasoning as subjects above:
+    // registered before api_routes()'s /lecturers/{lecturer} wildcard so
+    // "export"/"import" are never swallowed as an id.
+    Route::middleware('permission:lecturer.view')
+        ->get('/lecturers-export', [LecturerController::class, 'exportList'])
+        ->name('lecturers.export');
+    Route::middleware('permission:lecturer.create')
+        ->post('/lecturers-import', [LecturerController::class, 'importFile'])
+        ->name('lecturers.import');
+
     // Register API resource routes for various controllers
     api_routes([
         'faculties'       => FacultyController::class,

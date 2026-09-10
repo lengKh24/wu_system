@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use App\Helpers\Degree;
+
 class Subject extends IModel
 {
     public function __construct(array $attributes = [])
@@ -13,14 +15,19 @@ class Subject extends IModel
             $base = DEFAULT_FIELD_AND_CODE;
         }
 
-        $this->fillable   = array_merge($base, ['year_level', 'major_id', 'semester', 'credit']);
+        $this->fillable   = array_merge($base, ['faculty_id', 'level', 'lecturer_hour', 'credit']);
         $this->searchable = array_merge($this->fillable, [
-            'major.name', 'major.name_kh', 'major.name_en', 'major.shortcut',
+            'faculty.name', 'faculty.name_kh', 'faculty.name_en', 'faculty.shortcut',
         ]);
     }
 
-    public function major()
+    protected function casts(): array
     {
-        return $this->belongsTo(Major::class);
+        return ['level' => Degree::class];
+    }
+
+    public function faculty()
+    {
+        return $this->belongsTo(Faculty::class);
     }
 }
