@@ -49,6 +49,16 @@ class GroupImport implements ToCollection, WithHeadingRow, WithCustomCsvSettings
             return;
         }
 
+        // withTrashed() — matching only against non-deleted rows would miss
+        // a soft-deleted row still holding this shortcut, and updateOrCreate
+        // would then try to create a new one and collide with the DB-level
+        // unique constraint (which doesn't know about deleted_at).
+        $existing = Group::withTrashed()->where('shortcut', $shortcut)->first();
+        if ($existing && $existing->trashed()) {
+            $this->skip($rowNumber, $shortcut, 'A soft-deleted group already uses this shortcut. Restore it by hand first if you want it back.');
+            return;
+        }
+
         try {
             $group = Group::query()->updateOrCreate(
                 ['shortcut' => $shortcut],

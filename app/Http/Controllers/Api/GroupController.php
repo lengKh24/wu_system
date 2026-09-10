@@ -104,4 +104,40 @@ class GroupController extends Controller
     {
         return $this->clear($group);
     }
+
+    /**
+     * Permanently delete multiple groups in one request — same hard-delete
+     * behavior as force_destroy() above, just batched. Pass {"all": true}
+     * to wipe every group instead of listing ids individually. Deletes via
+     * a raw DB::table() query rather than looping per-model, same
+     * reasoning as SubjectController::bulkDestroy.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'all'   => 'sometimes|boolean',
+            'ids'   => 'sometimes|array|min:1',
+            'ids.*' => 'integer|exists:groups,id',
+        ]);
+
+        $all = $validated['all'] ?? false;
+        if (! $all && empty($validated['ids'])) {
+            return no_data('Either "ids" (non-empty array) or "all": true is required.', 422);
+        }
+
+        return execute(function () use ($validated, $all) {
+            $query = Group::withTrashed();
+
+            if (! $all) {
+                $query->whereIn('id', $validated['ids']);
+            }
+
+            $ids   = $query->pluck('id');
+            $count = $ids->count();
+
+            \Illuminate\Support\Facades\DB::table('groups')->whereIn('id', $ids)->delete();
+
+            return has_data(null, "{$count} group(s) permanently deleted.");
+        });
+    }
 }

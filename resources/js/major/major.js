@@ -11,6 +11,7 @@
         API_FACULTIES: '/api/v1/faculties',
         EXPORT_URL: '/api/v1/majors-export',
         IMPORT_URL: '/api/v1/majors-import',
+        BULK_DESTROY_URL: '/api/v1/majors-bulk-destroy',
         DEBOUNCE_DELAY: 300,
         LOCALE: 'en-GB'
     };
@@ -98,6 +99,7 @@
         submitBtn: document.getElementById('addmajorForm')?.querySelector('button[type="submit"]'),
 
         exportBtn: document.getElementById('majorExportBtn'),
+        destroyAllBtn: document.getElementById('majorDestroyAllBtn'),
 
         importBtn: document.getElementById('majorImportBtn'),
         importModal: document.getElementById('majorImportModal'),
@@ -525,6 +527,47 @@
         window.open(`${CONFIG.EXPORT_URL}?${params.toString()}`, '_blank');
     }
 
+    // Permanent hard-delete of every major — bypasses soft-delete
+    // entirely, so this asks for a typed confirmation rather than a plain
+    // OK/Cancel dialog. WARNING: cascades to delete every subject/student
+    // tied to each major too (DB-level cascadeOnDelete).
+    async function handleDestroyAll() {
+        const confirmation = await Swal.fire({
+            title: 'លុបជំនាញទាំងអស់ជាអចិន្ត្រៃយ៍?',
+            html: 'សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។ វាយ <b>DELETE</b> ដើម្បីបញ្ជាក់។<br><span class="text-xs text-neutral-400">This permanently deletes ALL majors and cannot be undone. Type DELETE to confirm.</span>',
+            icon: 'warning',
+            input: 'text',
+            inputPlaceholder: 'DELETE',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'លុបទាំងអស់ (Destroy All)',
+            cancelButtonText: 'បោះបង់',
+            preConfirm: (value) => {
+                if (value !== 'DELETE') {
+                    Swal.showValidationMessage('Type DELETE exactly to confirm.');
+                    return false;
+                }
+                return true;
+            },
+        });
+
+        if (!confirmation.isConfirmed) return;
+
+        const { error, data } = await ApiService.request(CONFIG.BULK_DESTROY_URL, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ all: true }),
+        });
+
+        if (!error) {
+            Toast.fire({ icon: 'success', title: data?.message || 'លុបទិន្នន័យទាំងអស់បានជោគជ័យ!' });
+            loadmajors('', 1);
+        } else {
+            Toast.fire({ icon: 'error', title: data?.message || 'មិនអាចលុបទិន្នន័យទាំងអស់បានទេ' });
+        }
+    }
+
     function initImportDropzone() {
         DOM.importDropzone?.addEventListener('click', () => DOM.importFileInput?.click());
         DOM.importDropzone?.addEventListener('keydown', (e) => {
@@ -576,6 +619,7 @@
 
         DOM.importBtn?.addEventListener('click', () => window.MajorImportModal.toggle(true));
         DOM.exportBtn?.addEventListener('click', exportCurrentFilters);
+        DOM.destroyAllBtn?.addEventListener('click', handleDestroyAll);
         DOM.importForm?.addEventListener('submit', submitImportForm);
         initImportDropzone();
 

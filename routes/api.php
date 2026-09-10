@@ -222,6 +222,9 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:faculty.create')
         ->post('/faculties-import', [FacultyController::class, 'importFile'])
         ->name('faculties.import');
+    Route::middleware('permission:faculty.delete')
+        ->delete('/faculties-bulk-destroy', [FacultyController::class, 'bulkDestroy'])
+        ->name('faculties.bulk-destroy');
 
     Route::middleware('permission:major.view')
         ->get('/majors-export', [MajorController::class, 'exportList'])
@@ -229,6 +232,9 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:major.create')
         ->post('/majors-import', [MajorController::class, 'importFile'])
         ->name('majors.import');
+    Route::middleware('permission:major.delete')
+        ->delete('/majors-bulk-destroy', [MajorController::class, 'bulkDestroy'])
+        ->name('majors.bulk-destroy');
 
     Route::middleware('permission:shift.view')
         ->get('/shifts-export', [ShiftController::class, 'exportList'])
@@ -236,6 +242,9 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:shift.create')
         ->post('/shifts-import', [ShiftController::class, 'importFile'])
         ->name('shifts.import');
+    Route::middleware('permission:shift.delete')
+        ->delete('/shifts-bulk-destroy', [ShiftController::class, 'bulkDestroy'])
+        ->name('shifts.bulk-destroy');
 
     Route::middleware('permission:group.view')
         ->get('/groups-export', [GroupController::class, 'exportList'])
@@ -243,6 +252,21 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:group.create')
         ->post('/groups-import', [GroupController::class, 'importFile'])
         ->name('groups.import');
+    Route::middleware('permission:group.delete')
+        ->delete('/groups-bulk-destroy', [GroupController::class, 'bulkDestroy'])
+        ->name('groups.bulk-destroy');
+
+    // Status maps to the "app-status" permission module (not "status" —
+    // see PermissionSeeder::MODULES), so these use that name.
+    Route::middleware('permission:app-status.view')
+        ->get('/statuses-export', [StatusController::class, 'exportList'])
+        ->name('statuses.export');
+    Route::middleware('permission:app-status.create')
+        ->post('/statuses-import', [StatusController::class, 'importFile'])
+        ->name('statuses.import');
+    Route::middleware('permission:app-status.delete')
+        ->delete('/statuses-bulk-destroy', [StatusController::class, 'bulkDestroy'])
+        ->name('statuses.bulk-destroy');
 
     // Register API resource routes for various controllers
     api_routes([
