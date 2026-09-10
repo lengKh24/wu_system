@@ -212,6 +212,38 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->delete('/lecturers-bulk-destroy', [LecturerController::class, 'bulkDestroy'])
         ->name('lecturers.bulk-destroy');
 
+    // Flat sibling routes for faculties/majors/shifts/groups — same
+    // reasoning as students/subjects/lecturers above: registered before
+    // api_routes()'s wildcard routes below so "export"/"import" are never
+    // swallowed as an id.
+    Route::middleware('permission:faculty.view')
+        ->get('/faculties-export', [FacultyController::class, 'exportList'])
+        ->name('faculties.export');
+    Route::middleware('permission:faculty.create')
+        ->post('/faculties-import', [FacultyController::class, 'importFile'])
+        ->name('faculties.import');
+
+    Route::middleware('permission:major.view')
+        ->get('/majors-export', [MajorController::class, 'exportList'])
+        ->name('majors.export');
+    Route::middleware('permission:major.create')
+        ->post('/majors-import', [MajorController::class, 'importFile'])
+        ->name('majors.import');
+
+    Route::middleware('permission:shift.view')
+        ->get('/shifts-export', [ShiftController::class, 'exportList'])
+        ->name('shifts.export');
+    Route::middleware('permission:shift.create')
+        ->post('/shifts-import', [ShiftController::class, 'importFile'])
+        ->name('shifts.import');
+
+    Route::middleware('permission:group.view')
+        ->get('/groups-export', [GroupController::class, 'exportList'])
+        ->name('groups.export');
+    Route::middleware('permission:group.create')
+        ->post('/groups-import', [GroupController::class, 'importFile'])
+        ->name('groups.import');
+
     // Register API resource routes for various controllers
     api_routes([
         'faculties'       => FacultyController::class,

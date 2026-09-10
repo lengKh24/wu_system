@@ -1,11 +1,14 @@
 <?php
 namespace App\Http\Controllers\Api;
 
+use App\Exports\GroupExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GroupRequest;
 use App\Http\Resources\GroupResource;
+use App\Imports\GroupImport;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GroupController extends Controller
 {
@@ -22,6 +25,36 @@ class GroupController extends Controller
     public function index(Request $request)
     {
         return $this->list($request);
+    }
+
+    public function exportList(Request $request)
+    {
+        return $this->export(
+            new GroupExport($request->only(['search'])),
+            'groups'
+        );
+    }
+
+    /**
+     * Bulk group import — see GroupImport's docblock for the exact
+     * column contract and what gets skipped vs created.
+     */
+    public function importFile(Request $request)
+    {
+        $validated = $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new GroupImport();
+
+        try {
+            Excel::import($import, $validated['file']);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Group import failed', ['error' => $e->getMessage()]);
+            return no_data('The file could not be processed. Please check it is a valid, correctly formatted spreadsheet.', 422);
+        }
+
+        return has_data(['report' => $import->report()], 'Import complete.');
     }
 
     /**
