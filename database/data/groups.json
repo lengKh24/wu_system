@@ -1,32 +1,32 @@
 [
     {
         "name_kh": "ក្រុមក",
-        "name_en": "Group A",
+        "name_en": "A",
         "shortcut": "GA"
     },
     {
         "name_kh": "ក្រុមខ",
-        "name_en": "Group B",
+        "name_en": "B",
         "shortcut": "GB"
     },
     {
         "name_kh": "ក្រុមគ",
-        "name_en": "Group C",
+        "name_en": "C",
         "shortcut": "GC"
     },
     {
         "name_kh": "ក្រុមឃ",
-        "name_en": "Group D",
+        "name_en": "D",
         "shortcut": "GD"
     },
     {
         "name_kh": "ក្រុមង",
-        "name_en": "Group E",
+        "name_en": "E",
         "shortcut": "GE"
     },
     {
         "name_kh": "ក្រុមច",
-        "name_en": "Group F",
+        "name_en": "F",
         "shortcut": "GF"
     }
 ]
