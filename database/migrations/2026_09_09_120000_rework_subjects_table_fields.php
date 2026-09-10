@@ -14,35 +14,71 @@ use Illuminate\Support\Facades\Schema;
  */
 return new class extends Migration
 {
+    /**
+     * Every step below is guarded with a hasColumn() check rather than run
+     * unconditionally. MySQL's DDL isn't transactional, so if this
+     * migration ever fails partway through (e.g. the dropForeign() call),
+     * the statements before the failure stay applied even though Laravel
+     * never marks the migration as run — a plain retry would then blow up
+     * on columns/keys that are already gone. Guarding each step lets a
+     * retry safely resume from wherever the previous attempt actually
+     * stopped, in either direction.
+     */
     public function up(): void
     {
         Schema::table('subjects', function (Blueprint $table) {
-            $table->dropColumn(['year_level', 'semester']);
+            if (Schema::hasColumn('subjects', 'year_level')) {
+                $table->dropColumn('year_level');
+            }
+            if (Schema::hasColumn('subjects', 'semester')) {
+                $table->dropColumn('semester');
+            }
 
             // dropForeign() before dropColumn() — MySQL refuses to drop a
             // column a foreign key still depends on (see the retake
             // registrations subject_id migration's note from this same
             // session for the full story on why this order matters).
-            $table->dropForeign(['major_id']);
-            $table->dropColumn('major_id');
+            if (Schema::hasColumn('subjects', 'major_id')) {
+                $table->dropForeign(['major_id']);
+                $table->dropColumn('major_id');
+            }
 
-            $table->foreignId('faculty_id')->after('id')->constrained()->cascadeOnDelete();
-            $table->string('level', 20)->default('associate')->after('code');
-            $table->unsignedInteger('lecturer_hour')->nullable()->after('level');
+            if (! Schema::hasColumn('subjects', 'faculty_id')) {
+                $table->foreignId('faculty_id')->after('id')->constrained()->cascadeOnDelete();
+            }
+            if (! Schema::hasColumn('subjects', 'level')) {
+                $table->string('level', 20)->default('associate')->after('code');
+            }
+            if (! Schema::hasColumn('subjects', 'lecturer_hour')) {
+                $table->unsignedInteger('lecturer_hour')->nullable()->after('level');
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('subjects', function (Blueprint $table) {
-            $table->dropColumn(['level', 'lecturer_hour']);
+            if (Schema::hasColumn('subjects', 'level')) {
+                $table->dropColumn('level');
+            }
+            if (Schema::hasColumn('subjects', 'lecturer_hour')) {
+                $table->dropColumn('lecturer_hour');
+            }
 
-            $table->dropForeign(['faculty_id']);
-            $table->dropColumn('faculty_id');
+            if (Schema::hasColumn('subjects', 'faculty_id')) {
+                $table->dropForeign(['faculty_id']);
+                $table->dropColumn('faculty_id');
+            }
 
-            $table->foreignId('major_id')->after('id')->constrained()->cascadeOnDelete();
-            $table->unsignedTinyInteger('year_level')->default(1);
-            $table->unsignedTinyInteger('semester')->default(1);
+            if (! Schema::hasColumn('subjects', 'major_id')) {
+                $table->foreignId('major_id')->after('id')->constrained()->cascadeOnDelete();
+            }
+            if (! Schema::hasColumn('subjects', 'year_level')) {
+                $table->unsignedTinyInteger('year_level')->default(1);
+            }
+            if (! Schema::hasColumn('subjects', 'semester')) {
+                $table->unsignedTinyInteger('semester')->default(1);
+            }
         });
     }
 };
